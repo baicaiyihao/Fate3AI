@@ -17,9 +17,15 @@ module fate3ai::profile{
 
     public fun signin(profile: &mut Profile, ctx: &TxContext) {
         let this_epoch_time = ctx.epoch_timestamp_ms();
-        assert!(is_same_day(this_epoch_time, profile.last_time));
-        profile.last_time = this_epoch_time;
-        profile.points = profile.points + 1;
+        if (profile.last_time != 0){
+            assert!(is_same_day(this_epoch_time, profile.last_time),0);
+            profile.last_time = this_epoch_time;
+            profile.points = profile.points + 1;
+        }else{
+            profile.last_time = this_epoch_time;
+            profile.points = profile.points + 1;
+        }
+
     }
 
     public fun burn(profile: Profile, ctx: &TxContext) {

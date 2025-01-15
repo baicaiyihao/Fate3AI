@@ -18,6 +18,8 @@ module fate3ai::fate{
     const DESCRIPTION: vector<u8> = b"FATE3AI";
     const ICON_URL: vector<u8> = b"https://";
 
+    const EWrongAmount: u64 = 0;
+
     public struct FATE has drop {}
 
     public struct AdminCap has key, store {
@@ -27,6 +29,17 @@ module fate3ai::fate{
     public struct AppTokenCap has key {
         id: UID,
         cap: TreasuryCap<FATE>,
+    }
+
+    public struct PriceRecord has key {
+        id: UID,
+        prices: Table<String, u64>,
+    }
+
+    public struct BuyEvent has copy, drop {
+        buyer: address,
+        item: String,
+        price: u64,
     }
 
 
@@ -54,9 +67,17 @@ module fate3ai::fate{
             cap: treasury_cap,
         };
 
+        let price_record = PriceRecord {
+            id: object::new(ctx),
+            prices: table::new<String, u64>(ctx),
+        };
+
         token::allow(&mut policy, &cap, token::spend_action(), ctx);
+
+
         token::share_policy<FATE>(policy);
         transfer::share_object(token_cap);
+        transfer::share_object(price_record);
         transfer::public_transfer(cap, deployer);
         transfer::public_freeze_object(metadata);
     }
@@ -75,6 +96,43 @@ module fate3ai::fate{
             ctx
         );
     }
+
+    public fun buy(
+        payment: Token<FATE>,
+        price_record: &PriceRecord,
+        item: String,
+        token_prolicy: &mut TokenPolicy<FATE>,
+        ctx: &mut TxContext
+    ) {
+        let price = &price_record.prices[item];
+        assert!(token::value<FATE>(&payment) == *price, EWrongAmount);
+        let req = token::spend(payment, ctx);
+        token::confirm_request_mut(token_prolicy, req, ctx);
+        emit(BuyEvent {
+            buyer: ctx.sender(),
+            item,
+            price: *price,
+        });
+    }
+
+    public fun split_token(
+        token: &mut Token<FATE>,
+        token_cap: &mut AppTokenCap,
+        amount: u64,
+        ctx: &mut TxContext
+    ) {
+        let token_to_pay = token::split<FATE>(token, amount, ctx);
+
+        let req = token::transfer<FATE>(token_to_pay, ctx.sender(), ctx);
+        token::confirm_with_treasury_cap<FATE>(
+            &mut token_cap.cap,
+            req,
+            ctx
+        );
+    }
+
+
+
 
     #[test_only]
     public fun init_for_testing_in_tests(ctx: &mut TxContext) {
