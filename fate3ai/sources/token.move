@@ -26,16 +26,19 @@ module fate3ai::fate{
         id: UID,
     }
 
+    //You can use it to mint token
     public struct AppTokenCap has key {
         id: UID,
         cap: TreasuryCap<FATE>,
     }
 
+    //AI agent price table
     public struct PriceRecord has key {
         id: UID,
         prices: Table<String, u64>,
     }
 
+    //Spend token event
     public struct BuyEvent has copy, drop {
         buyer: address,
         item: String,
@@ -72,6 +75,7 @@ module fate3ai::fate{
             prices: table::new<String, u64>(ctx),
         };
 
+        //just spend policy
         token::allow(&mut policy, &cap, token::spend_action(), ctx);
 
 
@@ -82,12 +86,13 @@ module fate3ai::fate{
         transfer::public_freeze_object(metadata);
     }
 
+    // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
         profile: &mut Profile,
         token_cap: &mut AppTokenCap,
         ctx: &mut TxContext
     ) {
-        profile::signin(profile, ctx);
+        profile::checkin(profile, ctx);
         let app_token = token::mint(&mut token_cap.cap, profile::dailypoints(profile), ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
@@ -97,16 +102,18 @@ module fate3ai::fate{
         );
     }
 
-    public fun buy(
-        payment: Token<FATE>,
+    // You can spend your Token<FATE> to use Ai Agent
+    public fun buyItem(
+        payment:&mut Token<FATE>,
         price_record: &PriceRecord,
         item: String,
         token_prolicy: &mut TokenPolicy<FATE>,
         ctx: &mut TxContext
     ) {
-        let price = &price_record.prices[item];
-        assert!(token::value<FATE>(&payment) == *price, EWrongAmount);
-        let req = token::spend(payment, ctx);
+        let price = table::borrow(&price_record.prices, item);
+        assert!(token::value<FATE>(payment) > *price, EWrongAmount);
+        let pay = token::split<FATE>(payment, *price, ctx);
+        let req = token::spend(pay, ctx);
         token::confirm_request_mut(token_prolicy, req, ctx);
         emit(BuyEvent {
             buyer: ctx.sender(),
@@ -114,25 +121,6 @@ module fate3ai::fate{
             price: *price,
         });
     }
-
-    public fun split_token(
-        token: &mut Token<FATE>,
-        token_cap: &mut AppTokenCap,
-        amount: u64,
-        ctx: &mut TxContext
-    ) {
-        let token_to_pay = token::split<FATE>(token, amount, ctx);
-
-        let req = token::transfer<FATE>(token_to_pay, ctx.sender(), ctx);
-        token::confirm_with_treasury_cap<FATE>(
-            &mut token_cap.cap,
-            req,
-            ctx
-        );
-    }
-
-
-
 
     #[test_only]
     public fun init_for_testing_in_tests(ctx: &mut TxContext) {

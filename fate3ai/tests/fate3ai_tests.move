@@ -22,7 +22,11 @@ module fate3ai::testtoken_tests;
 use std::string;
 use fate3ai::fate::{Self,AppTokenCap};
 use fate3ai::profile::{Self, Profile};
+use fate3ai::pyth::{Self};
 use sui::test_scenario::{Self};
+
+use sui::clock::{create_for_testing, set_for_testing,destroy_for_testing};
+
 
 #[test]
 fun test_create_profile(){
@@ -58,7 +62,29 @@ fun test_create_profile(){
 
     };
 
+    test_scenario::next_tx(scenario,user);
+    {
+        let profile = test_scenario::take_from_sender<Profile>(scenario);
+        assert!(profile::points(&profile) > 0);
+        test_scenario::return_to_sender(scenario,profile);
+
+    };
+
+    test_scenario::next_tx(scenario,user);
+
+    {
+        let mut clock1 =  create_for_testing(test_scenario::ctx(scenario));
+        set_for_testing(&mut clock1,1736311754);
+        pyth::use_pyth_price(
+            clock1,
+            0x50c67b3fd225db8912a424dd4baed60ffdde625ed2feaaf283724f9608fea266,
+        );
+
+    };
 
     test_scenario::end(scenario_val);
+
+
+
 
 }
