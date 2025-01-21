@@ -53,15 +53,12 @@ module fate3ai::fate{
         prices: Table<String, u64>,
     }
 
-
     //Spend token event
     public struct BuyEvent has copy, drop {
         buyer: address,
         item: String,
         price: u64,
     }
-
-
 
     fun init(otw: FATE, ctx: &mut TxContext) {
         let deployer = ctx.sender();
@@ -115,6 +112,8 @@ module fate3ai::fate{
         transfer::public_freeze_object(metadata);
     }
 
+    
+
     // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
         profile: &mut Profile,
@@ -122,7 +121,7 @@ module fate3ai::fate{
         ctx: &mut TxContext
     ) {
         profile::checkin(profile, ctx);
-        let app_token = token::mint(&mut token_cap.cap, profile::dailypoints(profile), ctx);
+        let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
@@ -150,6 +149,22 @@ module fate3ai::fate{
             price: *price,
         });
     }
+
+    public(package) fun mint_token(
+        token_cap: &mut AppTokenCap,
+        amount: u64,
+        user: address,
+        ctx: &mut TxContext
+    ){
+        let app_token = token::mint(&mut token_cap.cap, amount, ctx);
+        let req = token::transfer<FATE>(app_token, user, ctx);
+        token::confirm_with_treasury_cap<FATE>(
+            &mut token_cap.cap,
+            req,
+            ctx
+        );
+    }
+
 
     public fun swap_token(
         suicoin: &mut Coin<SUI>,

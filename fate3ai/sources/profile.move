@@ -1,5 +1,8 @@
 module fate3ai::profile{
+    use fate3ai::taro::{Taroinfo};
     use std::string::String;
+    use sui::table::{Self, Table};
+    use sui::dynamic_field;
 
     // User profile
     public struct Profile has key {
@@ -17,6 +20,27 @@ module fate3ai::profile{
         transfer::transfer(profile, sender);
     }
 
+    #[allow(lint(self_transfer))]
+    public fun add_taro_dynamic(
+        name: String,
+        profile: &mut Profile,
+        ctx: &mut TxContext
+    ){
+        let taro_table = table::new<u64,Taroinfo>(ctx);
+        dynamic_field::add(&mut profile.id, name, object::id(&taro_table));
+        transfer::public_transfer(taro_table,ctx.sender());
+    }
+
+    public fun del_taro_dynamic(
+        name: String,
+        profile: &mut Profile,
+        table: Table<u64,Taroinfo>,
+        _: &mut TxContext
+    ){
+        dynamic_field::remove<String, ID>(&mut profile.id,name);
+        remove_table(table);
+    }
+
     // Everyday checkin function
     public fun checkin(profile: &mut Profile, ctx: &TxContext) {
         let this_epoch_time = ctx.epoch_timestamp_ms();
@@ -28,7 +52,6 @@ module fate3ai::profile{
             profile.last_time = this_epoch_time;
             profile.points = profile.points + 1;
         }
-
     }
 
     // Burn user profile
@@ -48,7 +71,7 @@ module fate3ai::profile{
     }
 
     // Get user dailypoints
-    public fun dailypoints(profile: &Profile): u64 {
+    public fun daily_points(profile: &Profile): u64 {
         profile.dailypoints
     }
 
@@ -58,6 +81,12 @@ module fate3ai::profile{
         let day1 = timestamp1 / millis_per_day;
         let day2 = timestamp2 / millis_per_day;
         day1 == day2
+    }
+
+    fun remove_table(
+        table: Table<u64,Taroinfo>
+    ){
+        table::drop(table);
     }
 
     fun new(handle: String, ctx: &mut TxContext): Profile {
