@@ -1,9 +1,8 @@
-module fate3ai::profile{
-    use fate3ai::taro::{Taroinfo};
+module fate3ai::profile {
+    use fate3ai::taro::Taroinfo;
     use std::string::String;
-    use sui::table::{Self, Table};
     use sui::dynamic_field;
-
+    use sui::table::{Self, Table};
 
     // User profile
     public struct Profile has key {
@@ -14,7 +13,7 @@ module fate3ai::profile{
         last_time: u64,
     }
 
-    public struct RaffleNFT has key, store{
+    public struct RaffleNFT has key, store {
         id: UID,
         active_time: u64,
         factor: u64,
@@ -29,23 +28,19 @@ module fate3ai::profile{
     }
 
     #[allow(lint(self_transfer))]
-    public fun add_taro_dynamic(
-        name: String,
-        profile: &mut Profile,
-        ctx: &mut TxContext
-    ){
-        let taro_table = table::new<u64,Taroinfo>(ctx);
+    public fun add_taro_dynamic(name: String, profile: &mut Profile, ctx: &mut TxContext) {
+        let taro_table = table::new<u64, Taroinfo>(ctx);
         dynamic_field::add(&mut profile.id, name, object::id(&taro_table));
-        transfer::public_transfer(taro_table,ctx.sender());
+        transfer::public_transfer(taro_table, ctx.sender());
     }
 
     public fun del_taro_dynamic(
         name: String,
         profile: &mut Profile,
-        table: Table<u64,Taroinfo>,
-        _: &mut TxContext
-    ){
-        dynamic_field::remove<String, ID>(&mut profile.id,name);
+        table: Table<u64, Taroinfo>,
+        _: &mut TxContext,
+    ) {
+        dynamic_field::remove<String, ID>(&mut profile.id, name);
         remove_table(table);
     }
 
@@ -54,8 +49,8 @@ module fate3ai::profile{
         raffle_nft: &mut RaffleNFT,
         name: String,
         nft: address,
-        _: &mut TxContext
-    ){
+        _: &mut TxContext,
+    ) {
         dynamic_field::add(&mut profile.id, name, nft);
         profile.daily_points = profile.daily_points * raffle_nft.factor;
     }
@@ -64,57 +59,56 @@ module fate3ai::profile{
         profile: &mut Profile,
         raffle_nft: &mut RaffleNFT,
         name: String,
-    ){
+    ) {
         dynamic_field::remove<String, ID>(&mut profile.id, name);
         profile.daily_points = profile.daily_points / raffle_nft.factor;
     }
 
     // Everyday checkin function
     public fun checkin(
-        profile: &mut Profile, 
+        profile: &mut Profile,
         name: String,
         raffle_nft: &mut RaffleNFT,
-        ctx: &TxContext
-    ){
+        ctx: &TxContext,
+    ) {
         let this_epoch_time = ctx.epoch_timestamp_ms();
-        if (profile.last_time != 0){
-            assert!(is_same_day(this_epoch_time, profile.last_time),0);
-            if(dynamic_field::exists_(&profile.id, name)){
-                assert!(dynamic_field::borrow(&profile.id, name) == object::id(raffle_nft),1);
-                if(raffle_nft.checkin_time < raffle_nft.active_time){
+        if (profile.last_time != 0) {
+            assert!(is_same_day(this_epoch_time, profile.last_time), 0);
+            if (dynamic_field::exists_(&profile.id, name)) {
+                assert!(dynamic_field::borrow(&profile.id, name) == object::id(raffle_nft), 1);
+                if (raffle_nft.checkin_time < raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
-                }else if(raffle_nft.checkin_time == raffle_nft.active_time){
+                } else if (raffle_nft.checkin_time == raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
                     del_raffle_nft_to_profile(profile, raffle_nft, name)
                 }
-            }else{
+            } else {
                 profile.last_time = this_epoch_time;
                 profile.points = profile.points + 1;
             }
-        }else{
-            if(dynamic_field::exists_(&profile.id, name)){
-                assert!(dynamic_field::borrow(&profile.id, name) == object::id(raffle_nft),1);
-                if(raffle_nft.checkin_time < raffle_nft.active_time){
+        } else {
+            if (dynamic_field::exists_(&profile.id, name)) {
+                assert!(dynamic_field::borrow(&profile.id, name) == object::id(raffle_nft), 1);
+                if (raffle_nft.checkin_time < raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
-                }else if(raffle_nft.checkin_time == raffle_nft.active_time){
+                } else if (raffle_nft.checkin_time == raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
                     del_raffle_nft_to_profile(profile, raffle_nft, name)
                 }
-            }else{
+            } else {
                 profile.last_time = this_epoch_time;
                 profile.points = profile.points + 1;
             }
         }
     }
-
 
     // Burn user profile
     public fun burn(profile: Profile, ctx: &TxContext) {
@@ -122,7 +116,7 @@ module fate3ai::profile{
         assert!(this_epoch_time > profile.last_time);
         let Profile {
             id,
-            ..
+            ..,
         } = profile;
         object::delete(id);
     }
@@ -145,12 +139,8 @@ module fate3ai::profile{
         day1 == day2
     }
 
-        // Mint a new RaffleNFT with the specified prize duration
-    public(package) fun mint_raffle_nft(
-        active_time: u64,
-        user: address,
-        ctx: &mut TxContext
-    ){
+    // Mint a new RaffleNFT with the specified prize duration
+    public(package) fun mint_raffle_nft(active_time: u64, user: address, ctx: &mut TxContext) {
         let raffle_nft = RaffleNFT {
             id: object::new(ctx),
             active_time: active_time,
@@ -160,17 +150,12 @@ module fate3ai::profile{
         transfer::public_transfer(raffle_nft, user);
     }
 
-    public(package) fun burn_raffle_nft(
-        raffle_nft: RaffleNFT,
-        _ctx: &mut TxContext
-    ){
-        let RaffleNFT { id, active_time: _ , factor: _ ,checkin_time: _} = raffle_nft;
+    public(package) fun burn_raffle_nft(raffle_nft: RaffleNFT, _ctx: &mut TxContext) {
+        let RaffleNFT { id, active_time: _, factor: _, checkin_time: _ } = raffle_nft;
         object::delete(id);
     }
 
-    fun remove_table(
-        table: Table<u64,Taroinfo>
-    ){
+    fun remove_table(table: Table<u64, Taroinfo>) {
         table::drop(table);
     }
 

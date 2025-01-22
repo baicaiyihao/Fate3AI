@@ -1,20 +1,16 @@
-module fate3ai::fate{
-    use std::{
-        string::String
-    };
-    use sui::{
-        coin::{Self, TreasuryCap, Coin, into_balance, from_balance},
-        token::{Self, TokenPolicy, Token},
-        balance::{Balance, zero},
-        table::{Self, Table},
-        sui::SUI,
-        clock::Clock,
-        event::emit,
-        url::new_unsafe_from_bytes
-    };
+module fate3ai::fate {
     use fate3ai::profile::{Self, Profile, RaffleNFT};
     use fate3ai::pyth::use_pyth_price;
     use pyth::price_info::PriceInfoObject;
+    use std::string::String;
+    use sui::balance::{Balance, zero};
+    use sui::clock::Clock;
+    use sui::coin::{Self, TreasuryCap, Coin, into_balance, from_balance};
+    use sui::event::emit;
+    use sui::sui::SUI;
+    use sui::table::{Self, Table};
+    use sui::token::{Self, TokenPolicy, Token};
+    use sui::url::new_unsafe_from_bytes;
 
     const DECIMALS: u8 = 0;
     const SYMBOLS: vector<u8> = b"FATE";
@@ -36,9 +32,9 @@ module fate3ai::fate{
         cap: TreasuryCap<FATE>,
     }
 
-    public struct Suipool has key{
+    public struct Suipool has key {
         id: UID,
-        coin: Balance<SUI>
+        coin: Balance<SUI>,
     }
 
     //AI agent price table
@@ -72,16 +68,17 @@ module fate3ai::fate{
             NAME,
             DESCRIPTION,
             option::some(new_unsafe_from_bytes(ICON_URL)),
-            ctx
+            ctx,
         );
 
-        let suipool = Suipool{
+        let suipool = Suipool {
             id: object::new(ctx),
-            coin: zero<SUI>()
+            coin: zero<SUI>(),
         };
 
         let (mut policy, cap) = token::new_policy<FATE>(
-            &treasury_cap, ctx
+            &treasury_cap,
+            ctx,
         );
 
         let token_cap = AppTokenCap {
@@ -102,7 +99,6 @@ module fate3ai::fate{
         //just spend policy
         token::allow(&mut policy, &cap, token::spend_action(), ctx);
 
-
         token::share_policy<FATE>(policy);
         transfer::share_object(token_cap);
         transfer::share_object(suipool);
@@ -112,33 +108,31 @@ module fate3ai::fate{
         transfer::public_freeze_object(metadata);
     }
 
-    
-
     // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
         profile: &mut Profile,
         name: String,
         raffle_nft: &mut RaffleNFT,
         token_cap: &mut AppTokenCap,
-        ctx: &mut TxContext
+        ctx: &mut TxContext,
     ) {
-        profile::checkin(profile, name,raffle_nft,ctx);
+        profile::checkin(profile, name, raffle_nft, ctx);
         let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
             req,
-            ctx
+            ctx,
         );
     }
 
     // You can spend your Token<FATE> to use Ai Agent
     public fun buyItem(
-        payment:&mut Token<FATE>,
+        payment: &mut Token<FATE>,
         price_record: &PriceRecord,
         item: String,
         token_prolicy: &mut TokenPolicy<FATE>,
-        ctx: &mut TxContext
+        ctx: &mut TxContext,
     ) {
         let price = table::borrow(&price_record.prices, item);
         assert!(token::value<FATE>(payment) > *price, EWrongAmount);
@@ -156,17 +150,16 @@ module fate3ai::fate{
         token_cap: &mut AppTokenCap,
         amount: u64,
         user: address,
-        ctx: &mut TxContext
-    ){
+        ctx: &mut TxContext,
+    ) {
         let app_token = token::mint(&mut token_cap.cap, amount, ctx);
         let req = token::transfer<FATE>(app_token, user, ctx);
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
             req,
-            ctx
+            ctx,
         );
     }
-
 
     public fun swap_token(
         suicoin: &mut Coin<SUI>,
@@ -178,12 +171,12 @@ module fate3ai::fate{
         clock: &Clock,
         price_info_object: &PriceInfoObject,
         ctx: &mut TxContext,
-    ){
+    ) {
         let sui_price = use_pyth_price(clock, price_info_object);
-        let token_price = table::borrow(&token_record.prices,item);
+        let token_price = table::borrow(&token_record.prices, item);
         let paysui_amount = payamount * 10^8 / sui_price;
 
-        assert!(suicoin.value() > paysui_amount,EWrongAmount);
+        assert!(suicoin.value() > paysui_amount, EWrongAmount);
 
         let paycoin = suicoin.split(paysui_amount, ctx);
         suipool.coin.join(paycoin.into_balance());
@@ -194,24 +187,19 @@ module fate3ai::fate{
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
             req,
-            ctx
+            ctx,
         );
     }
 
-
     // ------ Admin Functions ---------
-    public fun mint_admincap(
-        _: &AdminCap,
-        admin: address,
-        ctx: &mut TxContext
-    ){
+    public fun mint_admincap(_: &AdminCap, admin: address, ctx: &mut TxContext) {
         let admin_cap = AdminCap {
             id: object::new(ctx),
         };
         transfer::transfer(admin_cap, admin);
     }
 
-    // for token::flush 
+    // for token::flush
     public fun treasury_borrow_mut(
         _admin: &AdminCap,
         app_token_cap: &mut AppTokenCap,
@@ -235,11 +223,7 @@ module fate3ai::fate{
     }
 
     // Admin can remove item price
-    public fun remove_item_price(
-        _admin: &AdminCap,
-        price_record: &mut PriceRecord,
-        item: String,
-    ) {
+    public fun remove_item_price(_admin: &AdminCap, price_record: &mut PriceRecord, item: String) {
         table::remove<String, u64>(&mut price_record.prices, item);
     }
 
@@ -259,11 +243,7 @@ module fate3ai::fate{
     }
 
     // Admin can remove token price
-    public fun remove_token_price(
-        _admin: &AdminCap,
-        token_record: &mut TokenRecord,
-        item: String,
-    ) {
+    public fun remove_token_price(_admin: &AdminCap, token_record: &mut TokenRecord, item: String) {
         table::remove<String, u64>(&mut token_record.prices, item);
     }
 
@@ -286,5 +266,4 @@ module fate3ai::fate{
         let otw = FATE {};
         init(otw, ctx);
     }
-
 }

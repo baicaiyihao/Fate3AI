@@ -1,10 +1,10 @@
 module fate3ai::raffle {
     use fate3ai::fate::{mint_token, AppTokenCap, AdminCap};
-    use fate3ai::profile::{mint_raffle_nft};
-    use sui::clock::{Clock, timestamp_ms};
+    use fate3ai::profile::mint_raffle_nft;
     use std::string::String;
+    use sui::clock::{Clock, timestamp_ms};
 
-    public struct RaffleInfo has key{
+    public struct RaffleInfo has key {
         id: UID,
         name: String,
         description: String,
@@ -14,14 +14,14 @@ module fate3ai::raffle {
         refund_rate: u64,
     }
 
-    public struct PrizeValidity has key, store{
+    public struct PrizeValidity has key, store {
         id: UID,
         grand_prize_duration: u64,
         second_prize_duration: u64,
         third_prize_duration: u64,
     }
 
-    public struct PrizeProb has key, store{
+    public struct PrizeProb has key, store {
         id: UID,
         grand_prize_weight: u64,
         second_prize_weight: u64,
@@ -30,8 +30,8 @@ module fate3ai::raffle {
 
     public struct RaffleNFT has key, store {
         id: UID,
-        activetime: u64,  // Prize validity period (in days)
-        factor: u64       // Prize multiplier factor
+        activetime: u64, // Prize validity period (in days)
+        factor: u64, // Prize multiplier factor
     }
 
     public fun create_raffle(
@@ -46,8 +46,8 @@ module fate3ai::raffle {
         grand_prize_weight: u64,
         second_prize_weight: u64,
         third_prize_weight: u64,
-        ctx: &mut TxContext
-    ){
+        ctx: &mut TxContext,
+    ) {
         let prize_prob = PrizeProb {
             id: object::new(ctx),
             grand_prize_weight,
@@ -88,8 +88,8 @@ module fate3ai::raffle {
         second_prize_weight: u64,
         third_prize_weight: u64,
         raffle_info: &mut RaffleInfo,
-        _: &mut TxContext
-    ){
+        _: &mut TxContext,
+    ) {
         raffle_info.name = name;
         raffle_info.description = description;
         raffle_info.ticket_cost = ticket_cost;
@@ -110,7 +110,7 @@ module fate3ai::raffle {
         taro: vector<u64>,
         raffleinfo: &RaffleInfo,
         token_cap: &mut AppTokenCap,
-        ctx: &mut TxContext
+        ctx: &mut TxContext,
     ) {
         let taro_seed = sum(&taro);
         let time_seed = timestamp_ms(time) % 1000;
@@ -121,21 +121,19 @@ module fate3ai::raffle {
         let prize = &raffleinfo.prize;
         let prize_prob = &raffleinfo.prize_prob;
 
-        if (final_rand < prize_prob.grand_prize_weight){
-            mint_raffle_nft(prize.grand_prize_duration,ctx.sender(),ctx);
-        }else if(final_rand < prize_prob.grand_prize_weight + prize_prob.second_prize_weight){
-            mint_raffle_nft(prize.second_prize_duration,ctx.sender(),ctx);
-        }else if(final_rand < prize_prob.grand_prize_weight + prize_prob.second_prize_weight + prize_prob.third_prize_weight){
-            mint_raffle_nft(prize.third_prize_duration,ctx.sender(),ctx);
-        }else{
-            mint_token(token_cap,raffleinfo.refund_rate, ctx.sender(),ctx);
+        if (final_rand < prize_prob.grand_prize_weight) {
+            mint_raffle_nft(prize.grand_prize_duration, ctx.sender(), ctx);
+        } else if (final_rand < prize_prob.grand_prize_weight + prize_prob.second_prize_weight) {
+            mint_raffle_nft(prize.second_prize_duration, ctx.sender(), ctx);
+        } else if (final_rand < prize_prob.grand_prize_weight + prize_prob.second_prize_weight + prize_prob.third_prize_weight) {
+            mint_raffle_nft(prize.third_prize_duration, ctx.sender(), ctx);
+        } else {
+            mint_token(token_cap, raffleinfo.refund_rate, ctx.sender(), ctx);
         }
     }
 
     // Function to get the prize details (validity period and factor)
-    public fun get_activetime(
-        rafflenft: &RaffleNFT
-    ): (u64, u64) {
+    public fun get_activetime(rafflenft: &RaffleNFT): (u64, u64) {
         (rafflenft.activetime, rafflenft.factor)
     }
 
@@ -149,5 +147,4 @@ module fate3ai::raffle {
         };
         total
     }
-
 }
