@@ -1,5 +1,6 @@
 module fate3ai::raffle {
     use fate3ai::fate::{mint_token, AppTokenCap, AdminCap};
+    use fate3ai::profile::{mint_raffle_nft};
     use sui::clock::{Clock, timestamp_ms};
     use std::string::String;
 
@@ -121,11 +122,11 @@ module fate3ai::raffle {
         let prize_prob = &raffleinfo.prize_prob;
 
         if (final_rand < prize_prob.grand_prize_weight){
-            mint(prize.grand_prize_duration,ctx.sender(),ctx);
+            mint_raffle_nft(prize.grand_prize_duration,ctx.sender(),ctx);
         }else if(final_rand < prize_prob.grand_prize_weight + prize_prob.second_prize_weight){
-            mint(prize.second_prize_duration,ctx.sender(),ctx);
+            mint_raffle_nft(prize.second_prize_duration,ctx.sender(),ctx);
         }else if(final_rand < prize_prob.grand_prize_weight + prize_prob.second_prize_weight + prize_prob.third_prize_weight){
-            mint(prize.third_prize_duration,ctx.sender(),ctx);
+            mint_raffle_nft(prize.third_prize_duration,ctx.sender(),ctx);
         }else{
             mint_token(token_cap,raffleinfo.refund_rate, ctx.sender(),ctx);
         }
@@ -149,17 +150,4 @@ module fate3ai::raffle {
         total
     }
 
-    // Mint a new RaffleNFT with the specified prize duration
-    fun mint(
-        activetime: u64,
-        user: address,
-        ctx: &mut TxContext
-    ){
-        let raffle_nft = RaffleNFT {
-            id: object::new(ctx),
-            activetime: activetime,
-            factor: 2
-        };
-        transfer::public_transfer(raffle_nft, user);
-    }
 }

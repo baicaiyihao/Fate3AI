@@ -12,7 +12,7 @@ module fate3ai::fate{
         event::emit,
         url::new_unsafe_from_bytes
     };
-    use fate3ai::profile::{Self, Profile};
+    use fate3ai::profile::{Self, Profile, RaffleNFT};
     use fate3ai::pyth::use_pyth_price;
     use pyth::price_info::PriceInfoObject;
 
@@ -117,10 +117,12 @@ module fate3ai::fate{
     // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
         profile: &mut Profile,
+        name: String,
+        raffle_nft: &mut RaffleNFT,
         token_cap: &mut AppTokenCap,
         ctx: &mut TxContext
     ) {
-        profile::checkin(profile, ctx);
+        profile::checkin(profile, name,raffle_nft,ctx);
         let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
