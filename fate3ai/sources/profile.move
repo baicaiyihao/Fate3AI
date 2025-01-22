@@ -54,6 +54,7 @@ module fate3ai::profile{
         }
     }
 
+
     // Burn user profile
     public fun burn(profile: Profile, ctx: &TxContext) {
         let this_epoch_time = ctx.epoch_timestamp_ms();

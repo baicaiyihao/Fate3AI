@@ -25,4 +25,13 @@ module fate3ai::taro{
     ){
         table::remove(table, k);
     }
+
+    public fun get_taro_info(
+        table: &mut Table<u64,Taroinfo>,
+        k: u64,
+        _: &mut TxContext
+    ): vector<u64>{
+        let taroinfo = table::borrow(table, k);
+        taroinfo.taro
+    }
 }
