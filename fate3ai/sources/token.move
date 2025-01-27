@@ -108,15 +108,31 @@ module fate3ai::fate {
         transfer::public_freeze_object(metadata);
     }
 
-    // Everyday checkin, you can get 150 Token<FATE>
+        // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
+        profile: &mut Profile,
+        token_cap: &mut AppTokenCap,
+        ctx: &mut TxContext,
+    ) {
+        profile::checkin(profile, ctx);
+        let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
+        let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
+        token::confirm_with_treasury_cap<FATE>(
+            &mut token_cap.cap,
+            req,
+            ctx,
+        );
+    }
+
+    // Everyday checkin, you can get 150 Token<FATE>
+    public fun signin2earn_nft(
         profile: &mut Profile,
         name: String,
         raffle_nft: &mut RaffleNFT,
         token_cap: &mut AppTokenCap,
         ctx: &mut TxContext,
     ) {
-        profile::checkin(profile, name, raffle_nft, ctx);
+        profile::checkin_withnft(profile, name, raffle_nft, ctx);
         let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(

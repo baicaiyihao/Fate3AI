@@ -2,6 +2,9 @@
 // import useContract from '../hooks/useContract';
 import { Toaster } from 'react-hot-toast';
 import MyButton from '../components/ui/button';
+import CreateProfile  from "../../components/createProfile";
+import Getuserinfo from '@/components/getUserProfile';
+import CheckIn from '@/components/checkIn';
 
 export default function More() {
   // const {syncResult,claimResult} = useContract();
@@ -20,6 +23,8 @@ export default function More() {
 
           <div className='w-2/3 h-10 flex flex-row justify-center items-center'>
             <MyButton text="Check in" />
+            <CheckIn/>
+            <Getuserinfo/>
           </div>
           <div className='w-full flex flex-col items-center justify-center mt-10'>
             <p className='text-5xl'>Check-in Rules</p>
@@ -35,3 +40,4 @@ export default function More() {
     </main>
   );
 }
+

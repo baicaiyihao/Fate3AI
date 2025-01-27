@@ -64,8 +64,15 @@ module fate3ai::profile {
         profile.daily_points = profile.daily_points / raffle_nft.factor;
     }
 
+    public fun checkin(profile: &mut Profile, ctx: &TxContext) {
+        let this_epoch_time = ctx.epoch_timestamp_ms();
+        assert!(this_epoch_time > profile.last_time);
+        profile.last_time = this_epoch_time;
+        profile.points = profile.points + 1;
+    }
+
     // Everyday checkin function
-    public fun checkin(
+    public fun checkin_withnft(
         profile: &mut Profile,
         name: String,
         raffle_nft: &mut RaffleNFT,
