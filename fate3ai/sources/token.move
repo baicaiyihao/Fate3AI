@@ -207,6 +207,19 @@ module fate3ai::fate {
         );
     }
 
+    public fun swap2token(
+        token_cap: &mut AppTokenCap,
+        ctx: &mut TxContext,
+    ) {
+        let app_token = token::mint(&mut token_cap.cap, 150, ctx);
+        let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
+        token::confirm_with_treasury_cap<FATE>(
+            &mut token_cap.cap,
+            req,
+            ctx,
+        );
+    }
+
     // ------ Admin Functions ---------
     public fun mint_admincap(_: &AdminCap, admin: address, ctx: &mut TxContext) {
         let admin_cap = AdminCap {

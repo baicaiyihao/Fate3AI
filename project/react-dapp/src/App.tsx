@@ -6,6 +6,8 @@ import Getuserinfo from "./components/getUserProfile";
 import AddAdmin from "./components/addAdmin";
 import SetItemsPrice from "./components/setItemPrice";
 import BuyItem from "./components/buyItems";
+import UsdToSuiConverter from "./components/UsdToSuiConverter";
+import SetTokenPrice from "./components/setTokenPrice";
 
 function App() {
   return (
@@ -49,6 +51,10 @@ function App() {
         <Getuserinfo /> 
 
         <br />
+        <span>购买token</span>
+        <UsdToSuiConverter />
+
+        <br />
         <h1>管理员功能</h1>
         <br />
         <span>添加管理员</span>
@@ -59,6 +65,11 @@ function App() {
         <span>设置占卜价格(预设一个价格</span>
         <span>已设置 item： taro ，price： 50 。要修改价格就填入 taro 和 要修改的 price即可</span>
         <SetItemsPrice />
+
+        <br />
+        <span>设置购买token价格(预设一个价格</span>
+        <span>已设置 item： usd ，price： 150 。要修改价格就填入 usd 和 要修改的 price即可</span>
+        <SetTokenPrice />
         
       </Container>
     </>

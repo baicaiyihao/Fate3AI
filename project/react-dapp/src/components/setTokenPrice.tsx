@@ -3,18 +3,21 @@ import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-ki
 import { Transaction } from "@mysten/sui/transactions";
 import { useNetworkVariable } from "../networkConfig";
 import { CategorizedObjects } from "../utils/assetsHelpers";
-import { TESTNET_AppTokenCap, TESTNET_FATE3AI_PACKAGE_ID, TESTNET_PriceRecord, TESTNET_TokenPolicy } from "../config/constants";
+import { TESTNET_AppTokenCap , TESTNET_PriceRecord, TESTNET_TokenRecord } from "../config/constants";
 import { getUserProfile } from "../utils/getUserObject";
 
 
 
-const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
+const SetTokenPrice: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const currentAccount = useCurrentAccount();
     const { mutateAsync: signAndExecute, isError } = useSignAndExecuteTransaction();
     const PackageId = useNetworkVariable("PackageId");
     const [userObjects, setUserObjects] = useState<CategorizedObjects | null>(null);
+    const [items, setItems] = useState("");
+    const [price, setPrice] = useState("");
 
-    const handleBuyItem = async () => {
+
+    const handleSetItemsPrice = async () => {
         if (!currentAccount?.address) {
             console.error("No connected account found.");
             return;
@@ -24,19 +27,18 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             const profile = await getUserProfile(currentAccount?.address);
             setUserObjects(profile);
     
-            const Token = Object.entries(profile.objects || {}).find(([objectType]) =>
-                objectType.includes(`${PackageId}::fate::FATE`)
+            const AdminCap = Object.entries(profile.objects || {}).find(([objectType]) =>
+                objectType.includes(`${PackageId}::fate::AdminCap`)
             ) as any;
-            console.log(Token);
     
-            const Tokenid = Token?.[1]?.[0]?.data?.objectId;
+            const AdminCapid = AdminCap?.[1]?.[0]?.data?.objectId;
     
-            if (!Tokenid) {
+            if (!AdminCapid) {
                 console.error("Profile ID is not found.");
                 return;
             }
     
-            console.log("Token ID:", Tokenid);
+            console.log("Profile ID:", AdminCapid);
             console.log("App Token Cap:", TESTNET_AppTokenCap);
             console.log("PackageId:", PackageId);
     
@@ -44,12 +46,12 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             tx.setGasBudget(10000000);
     
             tx.moveCall({
-                target: `${PackageId}::fate::buyItem`,
+                target: `${PackageId}::fate::set_token_price`,
                 arguments: [
-                    tx.object("0xed7297364c911fb94f0ae92f38e9195b4c35c7d22cd9732962e09ec4feb70250"),
-                    tx.object(TESTNET_PriceRecord),
-                    tx.pure.string("taro"),
-                    tx.object(TESTNET_TokenPolicy),
+                    tx.object(AdminCapid),
+                    tx.object(TESTNET_TokenRecord),
+                    tx.pure.string(items),
+                    tx.pure.u64(price)
                 ],
             });
     
@@ -67,14 +69,28 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     
     return (
         <div className="flex flex-col gap-4">
+            <input
+                type="text"
+                value={items}
+                onChange={(e) => setItems(e.target.value)}
+                placeholder="Enter Token"
+                className="p-2 border rounded"
+            />
+            <input
+                type="text"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Enter Token price"
+                className="p-2 border rounded"
+            />
             <button
-                onClick={handleBuyItem}
+                onClick={handleSetItemsPrice}
                 className="button-text"
             >
-                占卜
+                add price
             </button>
         </div>
     );
 };
 
-export default BuyItem;
+export default SetTokenPrice;
