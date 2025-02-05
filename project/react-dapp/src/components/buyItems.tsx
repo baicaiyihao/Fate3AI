@@ -25,7 +25,7 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             setUserObjects(profile);
     
             const Token = Object.entries(profile.objects || {}).find(([objectType]) =>
-                objectType.includes(`${PackageId}::fate::FATE`)
+                objectType.includes(`0x2::token::Token<${PackageId}::fate::FATE>`)
             ) as any;
             console.log(Token);
     
@@ -46,7 +46,7 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             tx.moveCall({
                 target: `${PackageId}::fate::buyItem`,
                 arguments: [
-                    tx.object("0xed7297364c911fb94f0ae92f38e9195b4c35c7d22cd9732962e09ec4feb70250"),
+                    tx.object(Tokenid),
                     tx.object(TESTNET_PriceRecord),
                     tx.pure.string("taro"),
                     tx.object(TESTNET_TokenPolicy),

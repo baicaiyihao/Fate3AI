@@ -1,6 +1,6 @@
 import { useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { SuiPriceServiceConnection, SuiPythClient } from "@pythnetwork/pyth-sui-js";
-import { Transaction } from "@mysten/sui/transactions";
+import { Transaction, TransactionObjectArgument } from "@mysten/sui/transactions";
 import { useState } from "react";
 import { getUserProfile } from "../utils/getUserObject";
 import { useNetworkVariable } from "../networkConfig";
@@ -73,15 +73,18 @@ const UsdToSuiConverter = () => {
     }
 
     try {
+        let coin: TransactionObjectArgument;
+
         const tx = new Transaction();
         const priceUpdateData = await connection.getPriceFeedsUpdateData(priceIDs);
         const priceInfoObjectIds = await suipythclient.updatePriceFeeds(tx, priceUpdateData, priceIDs);
-        tx.setGasBudget(100000000);
+        const suiPayAmount = (parseFloat(suiAmount) * 1000000000) + 100000000;
+        coin = tx.splitCoins(tx.gas, [suiPayAmount]);
 
         tx.moveCall({
             target: `${PackageId}::fate::swap_token`,
             arguments: [
-                tx.object("0x6f397517228e675a4d2cc8f0a9091e6c5cc3e850763ccdd39c30713c43b39a34"),
+                tx.object(coin),
                 tx.object(TESTNET_Suipool),
                 tx.pure.u64(usdAmount),
                 tx.object(TESTNET_AppTokenCap),
@@ -91,6 +94,7 @@ const UsdToSuiConverter = () => {
                 tx.object(priceInfoObjectIds[0]),
             ],
         });
+        tx.transferObjects([coin], currentAccount.address);
 
         const result = await signAndExecute({ transaction: tx });
 

@@ -3,6 +3,7 @@ module fate3ai::fate {
     use fate3ai::pyth::use_pyth_price;
     use pyth::price_info::PriceInfoObject;
     use std::string::String;
+    use pyth::i64::from_u64;
     use sui::balance::{Balance, zero};
     use sui::clock::Clock;
     use sui::coin::{Self, TreasuryCap, Coin, into_balance, from_balance};
@@ -54,6 +55,16 @@ module fate3ai::fate {
         buyer: address,
         item: String,
         price: u64,
+    }
+
+        //Spend token event
+    public struct BuyEvent1 has copy, drop {
+        buyer: address,
+        item: String,
+        price1: u64,
+        price2: u64,
+        price3: u64,
+        price4: u64,
     }
 
     fun init(otw: FATE, ctx: &mut TxContext) {
@@ -190,11 +201,13 @@ module fate3ai::fate {
     ) {
         let sui_price = use_pyth_price(clock, price_info_object);
         let token_price = table::borrow(&token_record.prices, item);
-        let paysui_amount = payamount * 10^8 / sui_price;
+        let paysui_amount = ((payamount * 100000000 * 1000000000) as u256 / (sui_price as u256)) as u64 ;
+
 
         assert!(suicoin.value() > paysui_amount, EWrongAmount);
 
         let paycoin = suicoin.split(paysui_amount, ctx);
+        let value = paycoin.value();
         suipool.coin.join(paycoin.into_balance());
 
         let token_amount = payamount * (*token_price);
@@ -205,19 +218,14 @@ module fate3ai::fate {
             req,
             ctx,
         );
-    }
-
-    public fun swap2token(
-        token_cap: &mut AppTokenCap,
-        ctx: &mut TxContext,
-    ) {
-        let app_token = token::mint(&mut token_cap.cap, 150, ctx);
-        let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
-        token::confirm_with_treasury_cap<FATE>(
-            &mut token_cap.cap,
-            req,
-            ctx,
-        );
+        emit(BuyEvent1 {
+            buyer: ctx.sender(),
+            item,
+            price1: sui_price,
+            price2: value,
+            price3: paysui_amount,
+            price4: token_amount,
+        });
     }
 
     // ------ Admin Functions ---------
