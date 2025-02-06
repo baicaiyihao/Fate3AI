@@ -12,6 +12,7 @@ import CreateRaffle from "./components/createRaffle";
 import SetRaffle from "./components/setRaffle";
 import Lottery from "./components/lottery";
 import SetRaffleNft from "./components/setRaffleNft";
+import TarotReading from "./components/TarotReading";
 
 function App() {
   return (
@@ -52,7 +53,12 @@ function App() {
         <br />
         <h2>占卜</h2>
         <span>读取 taro的价格然后 点击占卜进行扣除token</span>
-        <BuyItem  />
+        <BuyItem />
+        
+        <br />
+        <span>交易成功后调用eliza的占卜 </span>
+        <TarotReading />
+        <br />
 
         <br />
         <h2>Swap token</h2>
