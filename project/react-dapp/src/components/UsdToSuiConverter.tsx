@@ -80,6 +80,7 @@ const UsdToSuiConverter = () => {
         const priceInfoObjectIds = await suipythclient.updatePriceFeeds(tx, priceUpdateData, priceIDs);
         const suiPayAmount = (parseFloat(suiAmount) * 1000000000) + 100000000;
         coin = tx.splitCoins(tx.gas, [suiPayAmount]);
+        tx.setGasBudget(10000000);
 
         tx.moveCall({
             target: `${PackageId}::fate::swap_token`,

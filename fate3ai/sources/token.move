@@ -3,7 +3,6 @@ module fate3ai::fate {
     use fate3ai::pyth::use_pyth_price;
     use pyth::price_info::PriceInfoObject;
     use std::string::String;
-    use pyth::i64::from_u64;
     use sui::balance::{Balance, zero};
     use sui::clock::Clock;
     use sui::coin::{Self, TreasuryCap, Coin, into_balance, from_balance};
@@ -119,7 +118,7 @@ module fate3ai::fate {
         transfer::public_freeze_object(metadata);
     }
 
-        // Everyday checkin, you can get 150 Token<FATE>
+    // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
         profile: &mut Profile,
         token_cap: &mut AppTokenCap,
@@ -135,7 +134,7 @@ module fate3ai::fate {
         );
     }
 
-    // Everyday checkin, you can get 150 Token<FATE>
+    // Everyday checkin, you can get 300 Token<FATE>
     public fun signin2earn_nft(
         profile: &mut Profile,
         name: String,
