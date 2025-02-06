@@ -8,6 +8,7 @@ import SetItemsPrice from "./components/setItemPrice";
 import BuyItem from "./components/buyItems";
 import UsdToSuiConverter from "./components/UsdToSuiConverter";
 import SetTokenPrice from "./components/setTokenPrice";
+import TarotReading from "./components/TarotReading";
 
 function App() {
   return (
@@ -44,7 +45,12 @@ function App() {
 
         <span>占卜</span>
         <span>读取 taro的价格然后 点击占卜进行扣除token</span>
-        <BuyItem  />
+        <BuyItem />
+        
+        <br />
+        <span>交易成功后调用eliza的占卜 </span>
+        <TarotReading />
+        <br />
 
         <br />
         <span>用户信息</span>
