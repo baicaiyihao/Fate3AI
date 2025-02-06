@@ -188,3 +188,48 @@ const CreateRaffle: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
 };
 
 export default CreateRaffle;
+
+////抽奖组件 未引用
+// import React, { useState, useRef } from 'react'
+// import { LuckyWheel,SlotMachine } from '@lucky-canvas/react'
+
+// export default function Test() {
+//   const [blocks] = useState([
+//     { padding: '10px', background: '#869cfa' },
+//     { padding: '10px', background: '#e9e8fe' }, 
+//  ])
+//   const [prizes] = useState([
+//     { background: '#e9e8fe', fonts: [{ text: '0' }] },
+//     { background: '#b8c5f2', fonts: [{ text: '1' }] },
+//     { background: '#e9e8fe', fonts: [{ text: '2' }] },
+//     { background: '#b8c5f2', fonts: [{ text: '3' }] },
+//     { background: '#e9e8fe', fonts: [{ text: '4' }] },
+//     { background: '#b8c5f2', fonts: [{ text: '5' }] },
+//   ])
+ 
+//   const [defaultConfig] = useState({
+//     rowSpacing: '10px',
+//     colSpacing: '10px'
+//   })
+//   const myLucky = useRef()
+//   return <div>
+//     <SlotMachine
+//       ref={myLucky}
+//       width="240px"
+//       height="180px"
+//       blocks={blocks}
+//       prizes={prizes}
+//       defaultConfig={defaultConfig}
+//       onStart={() => { // 点击抽奖按钮会触发star回调
+//         myLucky.current.play()
+//         setTimeout(() => {
+//           const index = Math.random() * 6 >> 0
+//           myLucky.current.stop(index)
+//         }, 2500)
+//       }}
+//       onEnd={prize => { // 抽奖结束会触发end回调
+//         alert('恭喜你抽到 ' + prize.fonts[0].text + ' 号奖品')
+//       }}
+//     />
+//   </div>
+// }

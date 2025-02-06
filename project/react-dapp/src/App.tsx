@@ -12,8 +12,8 @@ import CreateRaffle from "./components/createRaffle";
 import SetRaffle from "./components/setRaffle";
 import Lottery from "./components/lottery";
 import SetRaffleNft from "./components/setRaffleNft";
-import TarotReading from "./components/TarotReading";
-
+import TarotReading from "./components/tarotReading";
+import Test from "./components/createRaffle";
 function App() {
   return (
     <>
@@ -59,6 +59,11 @@ function App() {
         <span>交易成功后调用eliza的占卜 </span>
         <TarotReading />
         <br />
+
+
+      
+        <span>抽奖</span>
+        {/* <Test /> */}
 
         <br />
         <h2>Swap token</h2>
