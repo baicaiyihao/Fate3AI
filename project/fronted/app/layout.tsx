@@ -13,6 +13,9 @@ import {
 	TESTNET_COUNTER_PACKAGE_ID,
 	MAINNET_COUNTER_PACKAGE_ID,
 } from "@/app/constant";
+
+import { Providers } from './providers';
+
 // Config options for the networks you want to connect to
 const { networkConfig } = createNetworkConfig({
   localnet: { url: getFullnodeUrl('localnet') },
@@ -34,29 +37,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode,
 }>) {
-  // const cookies = headers().get('cookie')
   return (
-     
+
     <html lang="en">
-    <body >
-    
-    <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-      <ContextProvider cookies="null">
-        <WalletProvider>
-            <div className={myFont.className} >
-            <TopNav />
-              <main style={{ position: 'relative', zIndex: 1 }}>
-                {children}
-              </main>
-              </div>
-        </WalletProvider>
-        </ContextProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
-      </body>
-    
-    </html>
-    
+    <body>
+    <div className={myFont.className} >
+    <main style={{ position: 'relative', zIndex: 1 }}>
+      <Providers>
+        {children}
+      </Providers>
+      </main>       
+       </div>
+    </body>
+  </html>    
   );
 }

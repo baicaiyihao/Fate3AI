@@ -5,7 +5,7 @@ import MyButton from '../components/ui/button';
 import CreateProfile  from "../../components/createProfile";
 import Getuserinfo from '@/components/getUserProfile';
 import CheckIn from '@/components/checkIn';
-
+import { useCurrentAccount } from '@mysten/dapp-kit';
 export default function More() {
   // const {syncResult,claimResult} = useContract();
   return (
@@ -23,7 +23,7 @@ export default function More() {
 
           <div className='w-2/3 h-10 flex flex-row justify-center items-center'>
             <MyButton text="Check in" />
-            <CheckIn/>
+            <CheckIn onSuccess={() => {}}/>
             <Getuserinfo/>
           </div>
           <div className='w-full flex flex-col items-center justify-center mt-10'>
