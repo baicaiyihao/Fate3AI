@@ -17,20 +17,51 @@ interface CardListProps {
     drawCount?: number;   // 可抽取的卡牌数量
 }
 
-export default function CardList({ totalCards = 22, drawCount = 1 }: CardListProps,onSuccess: () => void){
+export default function CardList({ totalCards = 22, drawCount = 1 }: CardListProps, onSuccess: () => void){
     const arr = Array.from({ length: totalCards }, (_, index) => index + 1);
     const [selectedCards, setSelectedCards] = useState<number[]>([]);
     const [randomNumbers, setRandomNumbers] = useState<number[]>([]);
+    const currentAccount = useCurrentAccount();
+    const { mutateAsync: signAndExecute, isError } = useSignAndExecuteTransaction();
+    const PackageId = useNetworkVariable("PackageId");
+    const [userObjects, setUserObjects] = useState<CategorizedObjects | null>(null);
 
 
+    // const handleCardClick = () => {
+    //     if (selectedCards.length === drawCount && randomNumbers.length === 0) {
+    //         const numbers: number[] = [];
+    //         for (let i = 0; i < drawCount; i++) {
+    //             const random = Math.floor(Math.random() * totalCards);
+    //             numbers.push(random);
+    //         }
+    //         setRandomNumbers(numbers);
+    //         console.log(numbers);
+    //     } else if (randomNumbers.length > 0) {
+    //         alert('You have already completed divination');
+    //     } else {
+    //         alert(`Please select ${drawCount} cards first`);
+    //     }
+    // };
     const handleCardClick = () => {
         if (selectedCards.length === drawCount && randomNumbers.length === 0) {
             const numbers: number[] = [];
-            for (let i = 0; i < drawCount; i++) {
-                const random = Math.floor(Math.random() * totalCards);
-                numbers.push(random);
+            const availableCards = arr.filter((_, index) => !selectedCards.includes(index)); // 排除已选中的卡牌
+    
+            if (availableCards.length < drawCount) {
+                alert("Not enough unique cards available to draw.");
+                return;
             }
+    
+            // 随机选择不重复的卡牌
+            for (let i = 0; i < drawCount; i++) {
+                const randomIndex = Math.floor(Math.random() * availableCards.length);
+                const randomCard = availableCards[randomIndex];
+                numbers.push(randomCard);
+                availableCards.splice(randomIndex, 1); // 移除已选中的卡牌，避免重复
+            }
+    
             setRandomNumbers(numbers);
+            console.log(numbers);
         } else if (randomNumbers.length > 0) {
             alert('You have already completed divination');
         } else {
@@ -51,6 +82,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
 
 
     const divinationResult = () => {
+
         return (
             <div className="flex flex-wrap gap-4 justify-center">
                 {randomNumbers.map((number, index) => (
@@ -67,10 +99,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
         );
     };
 
-    const currentAccount = useCurrentAccount();
-    const { mutateAsync: signAndExecute, isError } = useSignAndExecuteTransaction();
-    const PackageId = useNetworkVariable("PackageId");
-    const [userObjects, setUserObjects] = useState<CategorizedObjects | null>(null);
+    
 
     const handleBuyItem = async () => {
         if (!currentAccount?.address) {
@@ -155,6 +184,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     
             if (result && !isError) {
                 onSuccess();
+
             }
         } catch (error) {
             console.error("Error buying item:", error);
@@ -188,7 +218,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
                     </div>
                 ))}
             </div>
-            <div className='w-full flex flex-col items-center gap-4 mt-20 z-10'>
+            <div className='w-full flex flex-col items-center gap-4 mt-20 z-10'onClick={() => handleCardClick()} >
                 <p className="text-purple-600">
                     Selected: {selectedCards.length} / {drawCount} cards
                 </p>

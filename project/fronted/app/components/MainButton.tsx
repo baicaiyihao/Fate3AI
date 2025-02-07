@@ -5,12 +5,12 @@ export default function MainButton() {
     return (
         <div className="flex w-full h-64 flex-row z-50 relative">
             <div className="ml-5 mr-5 w-1/3 flex flex-col rounded-3xl border-2 border-gray-300 hover:border-black hover:-translate-y-2 p-2">
-                <Link href="/sync">
+                <Link href="/divination">
                     <div className="flex flex-row">
                         <p className="mt-4 ml-4 text-4xl text-black">
                         Tarot Reading
                         </p>
-                        <p className="mt-6 ml-4 text-lg text-gray-600 hover:text-black">
+                        <p className="mt-6 ml-4 text-lg text-gray-600ad hover:text-black">
 
                         </p>
                     </div>
@@ -22,6 +22,7 @@ export default function MainButton() {
 
 
             <div className="ml-5 mr-5 w-1/3 flex flex-col rounded-3xl border-2 border-gray-300 hover:border-black hover:-translate-y-2 p-2">
+              <Link href="/checkin">
                <div className="flex flex-row">
                     <p className="mt-4 ml-4 text-4xl text-black">
                        Daily Check-in
@@ -33,6 +34,8 @@ export default function MainButton() {
                 <p className="mt-4 ml-4 text-xl text-gray-600">
                     Earn points through daily check-ins and level up with consistent participation. Engage with the community to unlock exclusive privileges and rewards.
                 </p>
+                </Link>
+
             </div>
 
 
