@@ -126,3 +126,17 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

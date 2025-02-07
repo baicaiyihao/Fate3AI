@@ -21,6 +21,7 @@ export function TopNav() {
     }, [suiAccount]);
  
     return (
+        <div className="fade-in">
         <div className="flex w-full h-24 bg-nav flex-row z-50">
             <div className=" ml-5 w-1/4 flex flex-row text-white items-center">
                 <Image
@@ -121,6 +122,7 @@ export function TopNav() {
             <div className="w-1/4 flex flex-row items-center justify-end bg-nav text-xl mr-5">
                 <ConnectButton />
             </div>
+        </div>
         </div>
     );
 }
