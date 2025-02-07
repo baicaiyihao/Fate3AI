@@ -4,6 +4,7 @@ import { Transaction } from "@mysten/sui/transactions";
 import { useNetworkVariable } from "../config/networkConfig";
 import { TESTNET_AppTokenCap, TESTNET_RaffleInfo } from "../config/constants";
 import { suiClient } from "../cli/suiClient";
+import { Button } from "./ui/button";
 
 const Lottery: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const currentAccount = useCurrentAccount();
@@ -89,68 +90,52 @@ const Lottery: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     }, [currentAccount]);
     
     return (
-        <div className="flex flex-col gap-6 p-6 max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-bold mb-4">{raffleData?.name || '抽奖活动'}</h2>
-                <p className="text-gray-600 mb-4">{raffleData?.description}</p>
+        <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+            <div className="bg-white rounded-xl shadow-sm p-8 border border-purple-100">
+                <h2 className="text-3xl font-bold text-purple-800 mb-6">{raffleData?.name || '抽奖活动'}</h2>
+                <p className="text-purple-600 mb-6">{raffleData?.description}</p>
                 
-                <div className="grid gap-4 mb-6">
-                    <div className="flex justify-between border-b pb-2">
-                        <span className="font-medium">票价：</span>
-                        <span>{raffleData?.ticket_cost} Token</span>
+                <div className="grid gap-4 mb-8">
+                    <div className="flex justify-between border-b border-purple-100 pb-3">
+                        <span className="font-medium text-purple-700">票价：</span>
+                        <span className="text-purple-600">{raffleData?.ticket_cost} Token</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
-                        <span className="font-medium">退款比例：</span>
-                        <span>{raffleData?.refund_rate}%</span>
+                    <div className="flex justify-between border-b border-purple-100 pb-3">
+                        <span className="font-medium text-purple-700">退款比例：</span>
+                        <span className="text-purple-600">{raffleData?.refund_rate}%</span>
                     </div>
                 </div>
 
                 <div className="space-y-6">
-                    <h3 className="text-xl font-semibold mb-4">奖品信息</h3>
+                    <h3 className="text-2xl font-semibold text-purple-800 mb-4">奖品信息</h3>
                     
                     <div className="grid gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="font-medium text-lg mb-2">一等奖</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                                <div>有效期：{raffleData?.prize?.fields?.grand_prize_duration} 天</div>
-                                <div>中奖率：{raffleData?.prize_prob?.fields?.grand_prize_weight}%</div>
-                                <div>奖品效果：双倍签到奖励</div>
+                        {['一等奖', '二等奖', '三等奖'].map((prize, index) => (
+                            <div key={index} className="bg-purple-50 p-6 rounded-xl border border-purple-100">
+                                <h4 className="font-medium text-lg text-purple-700 mb-3">{prize}</h4>
+                                <div className="grid grid-cols-2 gap-3 text-sm text-purple-600">
+                                    <div>有效期：{raffleData?.prize?.fields?.[`${['grand', 'second', 'third'][index]}_prize_duration`]} 天</div>
+                                    <div>中奖率：{raffleData?.prize_prob?.fields?.[`${['grand', 'second', 'third'][index]}_prize_weight`]}%</div>
+                                    <div className="col-span-2">奖品效果：双倍签到奖励</div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="font-medium text-lg mb-2">二等奖</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                                <div>有效期：{raffleData?.prize?.fields?.second_prize_duration} 天</div>
-                                <div>中奖率：{raffleData?.prize_prob?.fields?.second_prize_weight}%</div>
-                                <div>奖品效果：双倍签到奖励</div>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="font-medium text-lg mb-2">三等奖</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                                <div>有效期：{raffleData?.prize?.fields?.third_prize_duration} 天</div>
-                                <div>中奖率：{raffleData?.prize_prob?.fields?.third_prize_weight}%</div>
-                                <div>奖品效果：双倍签到奖励</div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            <button
+            <Button
                 onClick={handleLottery}
-                className="bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors w-full"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6 text-lg font-medium rounded-xl transition-all duration-200"
             >
                 立即抽奖
-            </button>
+            </Button>
 
             {lotteryResult && (
-                <div className={`p-4 rounded-lg text-center text-lg font-medium ${
+                <div className={`p-6 rounded-xl text-center text-lg font-medium ${
                     lotteryResult.includes('恭喜') 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-700'
+                        ? 'bg-green-50 text-green-700 border border-green-200' 
+                        : 'bg-purple-50 text-purple-700 border border-purple-200'
                 }`}>
                     {lotteryResult}
                 </div>
