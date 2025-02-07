@@ -140,3 +140,11 @@
     opacity: 1;
   }
 }
+
+.text-nav {
+  @apply text-[#4F46E5];
+}
+
+.bg-nav {
+  @apply bg-[#4F46E5];
+}
