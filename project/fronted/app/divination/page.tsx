@@ -24,8 +24,10 @@ export default function Divination() {
                         <p className='text-4xl text-white'>Please select a card</p>
                     </div>
                     <div className='w-full h-3/4 flex flex-col justify-center'>
-                            <CardList />
-                      
+                    // 自定义配置（22张卡牌，抽3张）
+                    <CardList  totalCards={22} drawCount={3} onSuccess={() => {
+                        toast.success('Divination successful');
+                    }}/>                      
                     </div>
 
                 </div>
