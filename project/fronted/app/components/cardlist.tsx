@@ -15,6 +15,7 @@ import { getUserProfile } from "@/utils/getUserObject";
 interface CardListProps {
     totalCards?: number;  // 总卡牌数量
     drawCount?: number;   // 可抽取的卡牌数量
+    onSuccess?: () => void;
 }
 
 export default function CardList({ totalCards = 22, drawCount = 1 }: CardListProps, onSuccess: () => void){
@@ -84,7 +85,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     const divinationResult = () => {
 
         return (
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="flex gap-4 justify-center">
                 {randomNumbers.map((number, index) => (
                     <Image 
                         key={index}
@@ -100,7 +101,6 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     };
 
     
-
     const handleBuyItem = async () => {
         if (!currentAccount?.address) {
             console.error("No connected account found.");
