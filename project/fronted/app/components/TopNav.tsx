@@ -71,6 +71,15 @@ export function TopNav() {
                         Check in
                     </Link>
                 </div>
+                <div className="w-1/6  text-white/50">
+                    <Link
+                        className={`link ${pathname.startsWith("/swap") ? "text-white" : ""
+                            } block w-full h-full leading-[52px]`}
+                        href="/swap"
+                    >
+                        Swap
+                    </Link>
+                </div>
                 {/* <div className="w-1/6  text-white/50">
                     <a
                         rel="noopener noreferrer"
