@@ -9,7 +9,7 @@ export const TESTNET_TIME = "0x6";
 
 
 export const MAINNET_FATE3AI_PACKAGE_ID = "0xTODO"; // 主网占位符
-export const TAROT_CARDS : { [key: number]: { value: string } }={
+export const TAROT_CARDS_CN : { [key: number]: { value: string } }={
     0: { value: "愚者"},
     1: { value: "魔术师"} ,
     2: { value: "女祭司"},
@@ -33,3 +33,29 @@ export const TAROT_CARDS : { [key: number]: { value: string } }={
     20: { value: "审判"},
     21: { value: "世界"}
   };
+
+  export const TAROT_CARDS_EN: { [key: number]: { value: string } } = {
+    0: { value: "The Fool" },
+    1: { value: "The Magician" },
+    2: { value: "The High Priestess" },
+    3: { value: "The Empress" },
+    4: { value: "The Emperor" },
+    5: { value: "The Hierophant" },
+    6: { value: "The Lovers" },
+    7: { value: "The Chariot" },
+    8: { value: "Strength" },
+    9: { value: "The Hermit" },
+    10: { value: "Wheel of Fortune" },
+    11: { value: "Justice" },
+    12: { value: "The Hanged Man" },
+    13: { value: "Death" },
+    14: { value: "Temperance" },
+    15: { value: "The Devil" },
+    16: { value: "The Tower" },
+    17: { value: "The Star" },
+    18: { value: "The Moon" },
+    19: { value: "The Sun" },
+    20: { value: "Judgment" },
+    21: { value: "The World" }
+  };
+  

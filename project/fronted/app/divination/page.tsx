@@ -9,32 +9,40 @@ const ParticlesBg = dynamic(() => import("particles-bg"), { ssr: false })
 export default function Divination() {
     //   const {syncResult,claimResult} = useContract();
     return (
-        <main className="w-full bg-black">
-            <ParticlesBg type="cobweb" color="#4150B5"
-                bg={{
-                    position: "absolute",
-                    zIndex: 1,
-                    width: '100%'
-                } as any}
-            />
-            <div className="w-full flex flex-col justify-center items-center h-screen z-0">
-                <Toaster />
-                <div className='-mt-20 w-2/3 h-2/3 flex flex-col p-2'>
-                    <div className='w-full flex flex-row justify-center'>
-                        <p className='text-4xl text-white'>Please select a card</p>
-                    </div>
-                    <div className='w-full h-3/4 flex flex-col justify-center'>
-                    // 自定义配置（22张卡牌，抽3张）
-                    <CardList  totalCards={22} drawCount={3} onSuccess={() => {
-                        toast.success('Divination successful');
-                    }}/>                      
-                    </div>
+        <main className="w-full min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden">
+    {/* 背景粒子效果 */}
+    <ParticlesBg 
+        type="cobweb" 
+        color="#4150B5"
+        bg={{
+            position: "absolute",
+            zIndex: 0,
+            width: '100%',
+            height: '100%'
+        } as any}
+    />
 
-                </div>
+    {/* 主容器 */}
+    <div className="relative w-full max-w-5xl flex flex-col items-center justify-center text-center px-4 z-10">
+        <Toaster />
+        
+        {/* 标题 */}
+        <p className="text-4xl text-white font-bold mb-8">
+            Please select a card
+        </p>
 
+        {/* 卡牌区域 */}
+        <div className="w-full flex flex-col items-center justify-center">
+            <CardList  
+                totalCards={22} 
+                drawCount={3} 
+                onSuccess={() => {
+                    toast.success('Divination successful');
+                }}
+            />                      
+        </div>
+    </div>
+</main>
 
-            </div>
-
-        </main>
     );
 }

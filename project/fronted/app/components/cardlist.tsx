@@ -1,15 +1,8 @@
 "use client";
 import React, { useState ,useCallback, useEffect} from "react";
-import { base_prompt_en,  } from '../utils/fateprompt';
 import Image from "next/image";
-import { Button } from "@headlessui/react";
-import MyDialog from "./ui/dialog";
-import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { useNetworkVariable } from "@/config/networkConfig";
-import { CategorizedObjects } from "@/utils/assetsHelpers";
-import { TAROT_CARDS } from "@/config/constants";
-import BuyItems from "@/components/buyItems";
-
+import { TAROT_CARDS_EN} from "@/config/constants";
+import Divination from "@/components/divination";
 const AGENT_ID = process.env.NEXT_PUBLIC_ELIZA_AGENT_ID || '';
 const ELIZA_URL = process.env.NEXT_PUBLIC_ELIZA_URL || '';
   
@@ -28,221 +21,134 @@ export default function CardList({ totalCards = 22, drawCount = 1,onSuccess }: C
     const [response, setResponse] = useState('');
     const [cardValue, setCardValue] = useState<string[]>([]);
 
-    // const handleCardClick = () => {
-    //     if (selectedCards.length === drawCount && randomNumbers.length === 0) {
-    //         const numbers: number[] = [];
-    //         for (let i = 0; i < drawCount; i++) {
-    //             const random = Math.floor(Math.random() * totalCards);
-    //             numbers.push(random);
-    //         }
-    //         setRandomNumbers(numbers);
-    //         console.log(numbers);
-    //     } else if (randomNumbers.length > 0) {
-    //         alert('You have already completed divination');
-    //     } else {
-    //         alert(`Please select ${drawCount} cards first`);
-    //     }
-    // };
+    
 
     useEffect(() => {
         if (randomNumbers.length > 0) {
-            const selectedValues = randomNumbers.map(index => TAROT_CARDS[index]?.value || '');
+            console.log("randomNumbers",randomNumbers)
+            const selectedValues = randomNumbers.map(index => TAROT_CARDS_EN[index]?.value || '');
             setCardValue(selectedValues);
         }
     }, [randomNumbers]); 
 
-    // const handleCardClick = () => {
-    //     if (selectedCards.length === drawCount && randomNumbers.length === 0) {
-    //         const numbers: number[] = [];
-    //         const availableCards = arr.filter((_, index) => !selectedCards.includes(index)); // 排除已选中的卡牌
     
-    //         if (availableCards.length < drawCount) {
-    //             alert("Not enough unique cards available to draw.");
-    //             return;
-    //         }
-    
-    //         // 随机选择不重复的卡牌
-    //         for (let i = 0; i < drawCount; i++) {
-    //             const randomIndex = Math.floor(Math.random() * availableCards.length);
-    //             const randomCard = availableCards[randomIndex];
-    //             numbers.push(randomCard);
-    //             availableCards.splice(randomIndex, 1); // 移除已选中的卡牌，避免重复
-    //         }
-    
-    //         setRandomNumbers(numbers);
-
-    //         console.log(numbers);  
-             
-    //         let cardValue = [];
-    //         for (let i = 0; i < numbers.length; i++) {
-    //             const index = numbers[i];
-    //             if (TAROT_CARDS[index]) {
-    //               const value = TAROT_CARDS[index].value;
-    //               cardValue.push(value);
-    //               setCardValue((prev) => [...prev, value]);
-
-    //             }
-                
-    //         }
-    //         console.log("setingcardValue:",cardValue); //use code for divination
-    //     }
-    //     else if (randomNumbers.length > 0 ) {
-    //         alert('You have already completed divination');
-    //     } 
-    //     else {
-    //         alert(`Please select ${drawCount} cards first`);
-    //     }
-    // };
-
-    const handleCardClick = () => {
-        if (selectedCards.length !== drawCount || randomNumbers.length > 0) {
-            alert(randomNumbers.length > 0 ? 'You have already completed divination' : `Please select ${drawCount} cards first`);
-            return;
-        }
-
-        const availableCards = arr.filter(card => !selectedCards.includes(card));
-        if (availableCards.length < drawCount) {
-            alert("Not enough unique cards available to draw.");
-            return;
-        }
-
-        const drawnNumbers = new Set<number>();
-        while (drawnNumbers.size < drawCount) {
-            const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
-            drawnNumbers.add(randomCard);
-        }
-
-        setRandomNumbers(Array.from(drawnNumbers));
-    };
-    
-    // const onCardClick = (index: number) => {
-    //     if (selectedCards.includes(index)) {
-    //         setSelectedCards(selectedCards.filter(cardIndex => cardIndex !== index));
-    //     } else if (selectedCards.length < drawCount) {
-    //         setSelectedCards([...selectedCards, index]);
-    //     } else {
-    //         alert(`You can only select ${drawCount} cards`);
-    //     }
-    // };
-
-
     const onCardClick = (index: number) => {
-        setSelectedCards(prev =>
-            prev.includes(index) ? prev.filter(card => card !== index) : prev.length < drawCount ? [...prev, index] : prev
-        );
-    };
-
-
-    const divinationResult = () => {
-        console.log("divinationResult:start");
-        return (
-            <div className="flex gap-4 justify-center">
-                {randomNumbers.map((number, index) => (
-                    <Image 
-                        key={index}
-                        src={`/cards/${number}.jpg`} 
-                        alt={`card-${index}`} 
-                        width={400} 
-                        height={400} 
-                        className="w-full max-w-[300px] h-auto"
-                    />
-                ))}
-            </div>
-        );
-    };
-
+        setSelectedCards((prev) => {
+            const updatedSelection = prev.includes(index)
+                ? prev.filter((card) => card !== index) // 取消选中
+                : prev.length < drawCount
+                ? [...prev, index] // 继续选牌
+                : prev;
     
-
-
-const [loading, setLoading] = useState(false);
-
-const handleSubmit = useCallback(async (cardValue: string[], question: string) => {
-    if (loading) return; // 避免重复提交
-
-    setLoading(true);
-    setResponse(""); // 清空上次的结果
-    console.log("handleSubmit:start");
-    console.log("use:", cardValue);
-    console.log("question:", question);
-
-    const formDataToSend = new FormData();
-    formDataToSend.append('user', '');
-    formDataToSend.append('text', base_prompt_en + "Cards:" + cardValue + "\n" + question);
-    formDataToSend.append('action', "NONE");
-
-    console.log("url:", ELIZA_URL + AGENT_ID + '/message');
-
-    try {
-        const response = await fetch(ELIZA_URL + AGENT_ID + '/message', {
-            method: 'POST',
-            body: formDataToSend,
-            headers: {
-                'Accept': 'application/json',
-                'Accept-Language': 'zh-CN,zh;q=0.9',
-            },
+            // 如果牌未选满，直接返回
+            if (updatedSelection.length < drawCount) return updatedSelection;
+    
+            // 如果已经完成占卜，不允许重复操作
+            if (randomNumbers.length > drawCount && response.length > 0) {
+                alert('You have already completed divination');
+                return prev;
+            }
+    
+            // 选中的牌已经够3张了，更新 randomNumbers
+            setRandomNumbers(updatedSelection);
+    
+            // 计算选中的牌值
+            const selectedValues = updatedSelection.map(i => TAROT_CARDS_EN[i]?.value || '');
+            setCardValue(selectedValues);
+    
+            return updatedSelection;
         });
+    };
+    
+    const divinationResult = () => {
+                return (
+                    <div className="flex flex-wrap gap-4 justify-center mt-6">
+                    {selectedCards.map((number, index) => (
+                        <Image
+                            key={index}
+                            src={`/cards/${number}.jpg`}
+                            alt={`card-${index}`}
+                            width={200}
+                            height={300}
+                            className="object-cover rounded-lg shadow-md"
+                        />
+                    ))}
+                </div>
+                );
+            };
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-        const data = await response.json();
-        console.log("response data：", data);
-
-        setResponse(data.map((item: any) => item.text).join("\n")); // 处理响应
-    } catch (error) {
-        console.error("请求失败:", error);
-        setResponse(`❌ 请求失败: ${(error as Error).message}`);
-    } finally {
-        setLoading(false);
-    }
-}, [loading]); // 依赖项，避免 handleSubmit 频繁重新创建
 
 
     return (
-        <div className="flex w-full h-full flex-col items-center justify-center overflow-x-auto mt-10">
-            <div className="w-5/6 h-72 relative min-w-[800px] mt-10">
-                {arr.map((item, index) => (
-                    <div
-                        key={index}
-                        onClick={() => onCardClick(index)}
-                        className={`ml-10
-                            absolute transition-all duration-300 ease-in-out 
-                            hover:-translate-y-6
-                            ${selectedCards.includes(index) ? '-translate-y-6' : ''}
-                        `}
-                        style={{
-                            left: `${index * 40}px`,
-                            zIndex: arr.length - index
-                        }}
-                    >
-                        <Image
-                            src="/card.png"
-                            alt="cardlist"
-                            className="object-cover"
-                            width={120}
-                            height={200}
-                        />
-                    </div>
-                ))}
+        <div className="flex flex-col items-center justify-center w-full h-full overflow-x-auto mt-10">
+    {/* 卡牌区域 */}
+    <div className="relative flex flex-wrap justify-center w-full max-w-4xl min-w-[800px] h-72 mt-10 gap-2">
+        {arr.map((item, index) => (
+            <div
+                key={index}
+                onClick={() => onCardClick(index)}
+                className={`absolute transition-transform duration-300 ease-in-out cursor-pointer 
+                    hover:-translate-y-4 
+                    ${selectedCards.includes(index) ? '-translate-y-6 scale-110' : ''}`}
+                style={{
+                    left: `${index * 50}px`, // 调整间距
+                    zIndex: arr.length - index
+                }}
+            >
+                <Image
+                    src="/card.png"
+                    alt="cardlist"
+                    className="object-cover rounded-lg shadow-lg"
+                    width={120}
+                    height={200}
+                />
             </div>
-            <div className='w-full flex flex-col items-center gap-6 mt-20 z-10'onClick={() => handleCardClick()} >
-                <p className="text-purple-600">
-                    Selected: {selectedCards.length} / {drawCount} cards
-                </p>
-                  {/* 问题输入 */}
-                  <input type="text" placeholder="Enter your question" className="w-1/4 p-2 border border-gray-300 rounded-md" onChange={(e) => setQuestion(e.target.value)}/>
+        ))}
+    </div>
 
-                    <div className='w-1/4'>
+    {/* 操作区 */}
+    <div className="flex flex-col items-center w-full gap-6 mt-16 z-10">
+        {/* 选中状态 */}
+        <p className="text-lg font-semibold text-purple-600">
+            Selected: {selectedCards.length} / {drawCount} cards
+        </p>
 
-                    <BuyItems onSuccess={()=>{
-                        if (!loading) handleSubmit(cardValue, question);
-                        }}/>
-                    </div>
-                    {loading && <p className="text-blue-500">Loading...</p>}
+        {/* 输入框 */}
+        <input
+            type="text"
+            placeholder="Enter your question"
+            className="w-1/3 p-2 border border-gray-300 rounded-md shadow-sm 
+                       focus:outline-none focus:ring-2 focus:ring-purple-400"
+            onChange={(e) => setQuestion(e.target.value)}
+        />
 
-                  <div className="text-purple-600">{response}</div>
 
-            </div>
-        </div>
+        <Divination cardValue={cardValue} question={question} onSuccess={() => {
+           
+        }} onError={() => {
+            alert("Divination failed");
+        }} />
+       
+
+            {selectedCards.length ==drawCount && (
+        <div className="flex flex-wrap gap-4 justify-center mt-6">
+         {selectedCards.map((number, index) => (
+             <Image
+                key={index}
+                src={`/cards/${number}.jpg`}
+                alt={`card-${index}`}
+                width={200}
+                height={300}
+                className="object-cover rounded-lg shadow-md"
+            />
+        ))}
+    </div>
+)}
+
+      
+    </div>
+</div>
+
     );
     
 }

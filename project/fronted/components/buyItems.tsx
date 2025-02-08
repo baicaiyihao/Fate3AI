@@ -7,7 +7,7 @@ import { TESTNET_PriceRecord, TESTNET_TokenPolicy } from "../config/constants";
 import { getUserProfile } from "../utils/getUserObject";
 import { Button } from "./ui/button";
 
-const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
+const BuyItem: React.FC<{ onSuccess: () => void, onError: (error: any) => void }> = ({ onSuccess, onError }) => {
     const currentAccount = useCurrentAccount();
     const { mutateAsync: signAndExecute, isError } = useSignAndExecuteTransaction();
     const PackageId = useNetworkVariable("PackageId");
@@ -16,6 +16,7 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const handleBuyItem = async () => {
         if (!currentAccount?.address) {
             console.error("No connected account found.");
+            onError("No connected account found.");
             return;
         }
     
@@ -97,9 +98,13 @@ const BuyItem: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             if (result && !isError) {
                 onSuccess();
             }
-            // if (true) { 调试用 正常后可删除
+            // if (true) { 
+            //     // 调试用 正常后可删除
             //     onSuccess();
             // }
+            else{
+                onError("支付失败");
+            }
         } catch (error) {
             console.error("Error buying item:", error);
         }
