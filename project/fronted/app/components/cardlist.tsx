@@ -1,16 +1,18 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
+import { base_prompt_en,  } from '../utils/fateprompt';
 import Image from "next/image";
-import MyButton from "./ui/button";
+import { Button } from "@headlessui/react";
 import MyDialog from "./ui/dialog";
 import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { Transaction } from "@mysten/sui/transactions";
 import { useNetworkVariable } from "@/config/networkConfig";
 import { CategorizedObjects } from "@/utils/assetsHelpers";
-import { TESTNET_PriceRecord, TESTNET_TokenPolicy } from "@/config/constants";
-import { getUserProfile } from "@/utils/getUserObject";
+import { TAROT_CARDS } from "@/config/constants";
+import BuyItems from "@/components/buyItems";
 
+const AGENT_ID = process.env.NEXT_PUBLIC_ELIZA_AGENT_ID || '';
+const ELIZA_URL = process.env.NEXT_PUBLIC_ELIZA_URL || '';
+  
 
 interface CardListProps {
     totalCards?: number;  // 总卡牌数量
@@ -26,7 +28,9 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     const { mutateAsync: signAndExecute, isError } = useSignAndExecuteTransaction();
     const PackageId = useNetworkVariable("PackageId");
     const [userObjects, setUserObjects] = useState<CategorizedObjects | null>(null);
-
+    const [question, setQuestion] = useState('');
+    const [response, setResponse] = useState('');
+    const [cardValue, setCardValue] = useState<string[]>([]);
 
     // const handleCardClick = () => {
     //     if (selectedCards.length === drawCount && randomNumbers.length === 0) {
@@ -43,6 +47,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     //         alert(`Please select ${drawCount} cards first`);
     //     }
     // };
+
     const handleCardClick = () => {
         if (selectedCards.length === drawCount && randomNumbers.length === 0) {
             const numbers: number[] = [];
@@ -62,10 +67,23 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
             }
     
             setRandomNumbers(numbers);
-            console.log(numbers);
-        } else if (randomNumbers.length > 0) {
+            console.log(numbers);   
+            let cardValue = [];
+            for (let i = 0; i < numbers.length; i++) {
+                const index = numbers[i];
+                if (TAROT_CARDS[index]) {
+                  const value = TAROT_CARDS[index].value;
+                  cardValue.push(value);
+                }
+                setCardValue(cardValue);
+                
+            }
+            console.log("setingcardValue:",cardValue); //use code for divination
+        }
+        else if (randomNumbers.length > 0 ) {
             alert('You have already completed divination');
-        } else {
+        } 
+        else {
             alert(`Please select ${drawCount} cards first`);
         }
     };
@@ -83,7 +101,7 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
 
 
     const divinationResult = () => {
-
+        console.log("divinationResult:start");
         return (
             <div className="flex gap-4 justify-center">
                 {randomNumbers.map((number, index) => (
@@ -101,95 +119,35 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     };
 
     
-    const handleBuyItem = async () => {
-        if (!currentAccount?.address) {
-            console.error("No connected account found.");
-            return;
-        }
-    
+
+
+    const handleSubmit = async (cardValue: string[],question:string) => {
+        console.log("handleSubmit:start");
+        console.log("use:",cardValue);
+        console.log("question:",question);
+
+        const formDataToSend = new FormData();
+        formDataToSend.append('user', '');//agent角色名称
+        formDataToSend.append('text',  base_prompt_en +"Cards:"+ cardValue+"\n"+ question);
+        formDataToSend.append('action',"NONE")
+        console.log("url:",ELIZA_URL+AGENT_ID+'/message');
         try {
-            const profile = await getUserProfile(currentAccount?.address);
-            setUserObjects(profile);
+          const response = await fetch(ELIZA_URL+AGENT_ID+'/message', {
+            method: 'POST',
+            body: formDataToSend,
+            headers: {
+              'Accept': 'application/json',
+              'Accept-Language': 'zh-CN,zh;q=0.9',
+            },
+          });
     
-            const allTokens = Object.entries(profile.objects || {}).filter(([objectType]) =>
-                objectType.includes(`0x2::token::Token<${PackageId}::fate::FATE>`)
-            ) as any;
-            console.log("All Tokens:", allTokens);
-
-            if (!allTokens || !allTokens[0] || !allTokens[0][1] || allTokens[0][1].length === 0) {
-                console.error("No tokens found");
-                return;
-            }
-
-            const tx = new Transaction();
-            tx.setGasBudget(10000000);
-
-            // 如果有多个 token，先合并
-            if (allTokens[0][1].length > 1) {
-                // 找出余额最大的 token 作为主 token
-                const primaryToken = allTokens[0][1].reduce((max: any, current: any) => {
-                    const maxBalance = parseInt(max.data.content.fields.balance);
-                    const currentBalance = parseInt(current.data.content.fields.balance);
-                    return maxBalance >= currentBalance ? max : current;
-                }, allTokens[0][1][0]);
-
-                const primaryTokenId = primaryToken.data.objectId;
-                const mergeTokens = allTokens[0][1]
-                    .filter((token: any) => token.data.objectId !== primaryTokenId)
-                    .map((token: any) => token.data.objectId);
-                
-                console.log("Primary Token:", primaryTokenId);
-                console.log("Merge Tokens:", mergeTokens);
-
-                // 合并所有 token
-                for (const tokenId of mergeTokens) {
-                    tx.moveCall({
-                        target: `0x2::token::join`,
-                        typeArguments: [`${PackageId}::fate::FATE`],
-                        arguments: [
-                            tx.object(primaryTokenId),
-                            tx.object(tokenId),
-                        ],
-                    });
-                }
-                console.log(primaryTokenId);
-
-                tx.moveCall({
-                    target: `${PackageId}::fate::buyItem`,
-                    arguments: [
-                        tx.object(primaryTokenId),
-                        tx.object(TESTNET_PriceRecord),
-                        tx.pure.string("taro"),
-                        tx.object(TESTNET_TokenPolicy),
-                    ],
-                });
-            } else {
-                // 只有一个 token 的情况
-                const Tokenid = allTokens[0][1][0].data.objectId;
-                console.log("Single Token ID:", Tokenid);
-                
-                tx.moveCall({
-                    target: `${PackageId}::fate::buyItem`,
-                    arguments: [
-                        tx.object(Tokenid),
-                        tx.object(TESTNET_PriceRecord),
-                        tx.pure.string("taro"),
-                        tx.object(TESTNET_TokenPolicy),
-                    ],
-                });
-            }
-    
-            const result = await signAndExecute({ transaction: tx });
-            console.log(result);
-    
-            if (result && !isError) {
-                onSuccess();
-
-            }
+          const data = await response.json(); // 获取响应数据
+          console.log("response data：",data)
+          setResponse(data.map((item:any)=>item.text)); // 显示响应
         } catch (error) {
-            console.error("Error buying item:", error);
+          setResponse(`错误: ${(error as Error).message}`); // 显示错误信息
         }
-    };
+      };
 
     return (
         <div className="flex w-full h-full flex-col items-center justify-center overflow-x-auto mt-10">
@@ -218,16 +176,20 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
                     </div>
                 ))}
             </div>
-            <div className='w-full flex flex-col items-center gap-4 mt-20 z-10'onClick={() => handleCardClick()} >
+            <div className='w-full flex flex-col items-center gap-6 mt-20 z-10'onClick={() => handleCardClick()} >
                 <p className="text-purple-600">
                     Selected: {selectedCards.length} / {drawCount} cards
                 </p>
-                <div className='w-1/4'>
-                    <MyDialog 
-                        text='Start Divination' 
-                        children={divinationResult()}
-                    />
-                </div>
+                  {/* 问题输入 */}
+                  <input type="text" placeholder="Enter your question" className="w-1/4 p-2 border border-gray-300 rounded-md" onChange={(e) => setQuestion(e.target.value)}/>
+
+                    <div className='w-1/4'>
+
+                    <BuyItems onSuccess={()=>{
+                            handleSubmit(cardValue,question)
+                        }}/>
+                    </div>
+                  <div className="text-purple-600">{response}</div>
             </div>
         </div>
     );

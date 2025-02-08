@@ -9,28 +9,27 @@ export const TESTNET_TIME = "0x6";
 
 
 export const MAINNET_FATE3AI_PACKAGE_ID = "0xTODO"; // 主网占位符
-const tarotCards = {
-    0: "愚者",
-    1: "魔术师",
-    2: "女祭司",
-    3: "女皇",
-    4: "皇帝",
-    5: "教皇",
-    6: "恋人",
-    7: "战车",
-    8: "力量",
-    9: "隐者",
-    10: "命运之轮",
-    11: "正义",
-    12: "倒吊人",
-    13: "死神",
-    14: "节制",
-    15: "恶魔",
-    16: "塔",
-    17: "星星",
-    18: "月亮",
-    19: "太阳",
-    20: "审判",
-    21: "世界"
+export const TAROT_CARDS : { [key: number]: { value: string } }={
+    0: { value: "愚者"},
+    1: { value: "魔术师"} ,
+    2: { value: "女祭司"},
+    3: { value: "女皇"},
+    4: { value: "皇帝"},
+    5: { value: "教皇"},
+    6: { value: "恋人"},
+    7: { value: "战车"} ,
+    8: { value: "力量"} ,
+    9: { value: "隐者"},
+    10: { value: "命运之轮"},
+    11: { value: "正义"},
+    12: { value: "倒吊人"},
+    13: { value: "死神"},
+    14: { value: "节制"},
+    15: { value: "恶魔"},
+    16: { value: "塔"},
+    17: { value: "星星"},
+    18: { value: "月亮"},
+    19: { value: "太阳"},
+    20: { value: "审判"},
+    21: { value: "世界"}
   };
-  export {tarotCards};
