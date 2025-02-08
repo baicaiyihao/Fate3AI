@@ -7,6 +7,7 @@ import { TESTNET_PriceRecord, TESTNET_TokenPolicy } from "../config/constants";
 import { getUserProfile } from "../utils/getUserObject";
 import { Button } from "./ui/button";
 import { base_prompt_en,  } from '../app/utils/fateprompt';
+import toast from "react-hot-toast";
 
 
 const AGENT_ID = process.env.NEXT_PUBLIC_ELIZA_AGENT_ID || '';
@@ -37,7 +38,7 @@ const Divination: React.FC<{ cardValue: string[], question: string, onSuccess: (
             ) as any;
 
             if (!allTokens.length || !allTokens[0][1]?.length) {
-                throw new Error("No tokens found");
+                toast.error("Token Not Found!Please check in get FATE token!");
             }
 
             const tx = new Transaction();
@@ -58,7 +59,7 @@ const Divination: React.FC<{ cardValue: string[], question: string, onSuccess: (
             const result = await signAndExecute({ transaction: tx });
 
             if (!result || isError) {
-                throw new Error("Payment failed");
+                toast.error("Payment failed");
             }
 
             // 2️⃣ **支付成功后，发送占卜请求**
@@ -86,10 +87,7 @@ const Divination: React.FC<{ cardValue: string[], question: string, onSuccess: (
             setResponse(data.map((item: any) => item.text).join("\n"));
             // setResponse("test");
             onSuccess();
-        } catch (error) {
-            console.error("Error:", error);
-            onError(error);
-        } finally {
+        }finally {
             setLoading(false);
         }
     };

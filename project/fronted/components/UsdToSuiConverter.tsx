@@ -134,7 +134,7 @@ const UsdToSuiConverter = () => {
                 setUsdAmount(e.target.value);
                 calculateSuiAmount(e.target.value);
               }}
-              placeholder="Enter USDT amount"
+              placeholder="Enter USDC amount"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">

@@ -6,6 +6,8 @@ import { CategorizedObjects } from "../utils/assetsHelpers";
 import { TESTNET_PriceRecord, TESTNET_TokenPolicy } from "../config/constants";
 import { getUserProfile } from "../utils/getUserObject";
 import { Button } from "./ui/button";
+import { toast } from "react-hot-toast";
+
 
 const BuyItem: React.FC<{ onSuccess: () => void, onError: (error: any) => void }> = ({ onSuccess, onError }) => {
     const currentAccount = useCurrentAccount();
@@ -30,7 +32,7 @@ const BuyItem: React.FC<{ onSuccess: () => void, onError: (error: any) => void }
             console.log("All Tokens:", allTokens);
 
             if (!allTokens || !allTokens[0] || !allTokens[0][1] || allTokens[0][1].length === 0) {
-                console.error("No tokens found");
+                toast.error("Token NotFound");
                 return;
             }
 

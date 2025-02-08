@@ -22,11 +22,11 @@ export default function SetRaffleNft() {
     // 添加 getNftStatus 函数
     const getNftStatus = (active_time: string, checkin_time: string): React.ReactNode => {
         if (checkin_time === "0") {
-            return "未使用";
+            return "Unused";
         } else if (checkin_time === active_time) {
-            return "已过期";
+            return "Expired";
         } else {
-            return `已使用 ${checkin_time}/${active_time} 天`;
+            return `Used ${checkin_time}/${active_time} Days`;
         }
     };
 
@@ -224,28 +224,28 @@ export default function SetRaffleNft() {
             {!account?.address ? (
                 <div className="text-center">
                     <h3 className="text-lg text-gray-400">
-                        请连接钱包查看奖励 NFT
+                        Please connect your wallet to view reward NFTs
                     </h3>
                 </div>
             ) : userObjects === null ? (
                 <div className="text-center">
                     <h3 className="text-lg text-gray-400">
-                        正在加载数据...
+                        Loading data...
                     </h3>
                 </div>
             ) : (
                 <div className="w-full max-w-3xl bg-gradient-to-r from-purple-700 to-purple-500 rounded-lg p-6 shadow-md">
-                    <h3 className="text-2xl font-semibold text-white mb-6">奖励 NFT 列表</h3>
+                    <h3 className="text-2xl font-semibold text-white mb-6">Reward NFT List</h3>
                     {Array.isArray(ProfileData) && ProfileData.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full bg-white rounded-lg overflow-hidden">
                                 <thead className="bg-gray-100">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-gray-600">NFT ID</th>
-                                        <th className="px-4 py-3 text-left text-gray-600">有效期</th>
-                                        <th className="px-4 py-3 text-left text-gray-600">状态</th>
-                                        <th className="px-4 py-3 text-left text-gray-600">奖励效果</th>
-                                        <th className="px-4 py-3 text-left text-gray-600">操作</th>
+                                        <th className="px-4 py-3 text-left text-gray-600">Valid Period</th>
+                                        <th className="px-4 py-3 text-left text-gray-600">Status</th>
+                                        <th className="px-4 py-3 text-left text-gray-600">Reward Effect</th>
+                                        <th className="px-4 py-3 text-left text-gray-600">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -277,12 +277,12 @@ export default function SetRaffleNft() {
                                                                     : "text-yellow-600"
                                                     }`}>
                                                         {nft.isUsedNft 
-                                                            ? "使用中"
+                                                            ? "In Use"
                                                             : getNftStatus(fields.active_time, fields.checkin_time)}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    {fields.factor}倍签到奖励
+                                                    {fields.factor}x Check-in Reward
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     {nft.isUsedNft ? (
@@ -294,7 +294,7 @@ export default function SetRaffleNft() {
                                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                             }`}
                                                         >
-                                                            {isSelected ? '取消选择' : '取消使用'}
+                                                            {isSelected ? 'Cancel Selection' : 'Cancel Use'}
                                                         </button>
                                                     ) : fields.checkin_time === fields.active_time ? (
                                                         <button
@@ -305,7 +305,7 @@ export default function SetRaffleNft() {
                                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                             }`}
                                                         >
-                                                            {isSelected ? '取消选择' : '销毁'}
+                                                            {isSelected ? 'Cancel Selection' : 'Destroy'}
                                                         </button>
                                                     ) : isUsable && (
                                                         <button
@@ -316,7 +316,7 @@ export default function SetRaffleNft() {
                                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                             }`}
                                                         >
-                                                            {isSelected ? '取消选择' : '选择'}
+                                                            {isSelected ? 'Cancel Selection' : 'Select'}
                                                         </button>
                                                     )}
                                                 </td>
@@ -327,7 +327,7 @@ export default function SetRaffleNft() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-300">暂无奖励 NFT</p>
+                        <p className="text-gray-300">No reward NFTs available</p>
                     )}
                     
                     {selectedNftId && (
@@ -354,11 +354,11 @@ export default function SetRaffleNft() {
                             {(() => {
                                 const selectedNft = ProfileData.find((nft: any) => nft.data.content.fields.id.id === selectedNftId);
                                 if (selectedNft?.isUsedNft) {
-                                    return '取消使用选中的 NFT';
+                                    return 'Cancel Use of Selected NFT';
                                 } else if (selectedNft?.data.content.fields.checkin_time === selectedNft?.data.content.fields.active_time) {
-                                    return '销毁选中的 NFT';
+                                    return 'Destroy Selected NFT';
                                 } else {
-                                    return '使用选中的 NFT';
+                                    return 'Use Selected NFT';
                                 }
                             })()}
                         </button>
