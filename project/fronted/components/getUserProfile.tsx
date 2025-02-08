@@ -16,6 +16,7 @@ export default function Getuserinfo() {
     const [hasProfile, setHasProfile] = useState(false);
     const [ProfileData, setProfileData] = useState<any | null>(null);
     const [usedNftData, setUsedNftData] = useState<any | null>(null);
+    const [totalBalance, setTotalBalance] = useState<number>(0);
 
     async function refreshUserProfile() {
         if (account?.address) {
@@ -26,6 +27,17 @@ export default function Getuserinfo() {
                 const Profile = Object.entries(profile.objects || {}).find(([objectType]) =>
                     objectType.includes(`${TESTNET_FATE3AI_PACKAGE_ID}::profile::Profile`)
                 );
+
+                const allTokens = Object.entries(profile.objects || {}).filter(([objectType]) =>
+                    objectType.includes(`0x2::token::Token<${PackageId}::fate::FATE>`)
+                ) as any;
+
+                // 计算所有 token 的总余额
+                const total = allTokens[0]?.[1]?.reduce((sum: number, token: any) => {
+                    const balance = parseInt(token.data.content.fields.balance) || 0;
+                    return sum + balance;
+                }, 0) || 0;
+                setTotalBalance(total);
 
                 if (Profile) {
                     setHasProfile(true);
@@ -90,16 +102,7 @@ export default function Getuserinfo() {
                                 return (
                                     <div key={index} className="w-full h-5/6  rounded-lg p-4 flex flex-col justify-center items-center gap-4">
                                         <div className="w-full flex flex-row justify-center items-center gap-4">
-                                            <div className="w-1/2 h-20 border-2 border-[#dcdee9] rounded-lg p-4">
-                                                <p className="text-lg font-medium text-gray-800">
-                                                    <div className="flex flex-row justify-center items-center gap-2">
-                                                        <Image src="/logo.png" alt="Points" width={20} height={20} />
-                                                        <span className="font-semibold text-purple-600 text-2xl">Points:</span>{" "}
-                                                    </div>
-                                                    <p className="text-3xl text-black-600 text-center">{fields?.points || "N/A"}</p>
-                                                </p>
-                                            </div>
-                                            <div className="w-1/2 h-20 border-2 border-[#dcdee9] rounded-lg p-4">
+                                            <div className="w-1/3 h-20 border-2 border-[#dcdee9] rounded-lg p-4">
                                                 <p className="text-lg font-medium text-gray-800">
                                                     <div className="flex flex-row justify-center items-center gap-2">
                                                         <Image src="/logo.png" alt="User ID" width={20} height={20} />
@@ -108,33 +111,57 @@ export default function Getuserinfo() {
                                                     <p className="text-3xl text-black-600 text-center">{fields?.handle || "N/A"}</p>
                                                 </p>
                                             </div>
+                                            <div className="w-1/3 h-20 border-2 border-[#dcdee9] rounded-lg p-4">
+                                                <p className="text-lg font-medium text-gray-800">
+                                                    <div className="flex flex-row justify-center items-center gap-2">
+                                                        <Image src="/logo.png" alt="Token Balance" width={20} height={20} />
+                                                        <span className="font-semibold text-purple-600 text-2xl">FATE:</span>{" "}
+                                                    </div>
+                                                    <p className="text-3xl text-black-600 text-center">{totalBalance}</p>
+                                                </p>
+                                            </div>
+                                            <div className="w-1/3 h-20 border-2 border-[#dcdee9] rounded-lg p-4">
+                                                <p className="text-lg font-medium text-gray-800">
+                                                    <div className="flex flex-row justify-center items-center gap-2">
+                                                        <Image src="/logo.png" alt="Points" width={20} height={20} />
+                                                        <span className="font-semibold text-purple-600 text-2xl">Points:</span>{" "}
+                                                    </div>
+                                                    <p className="text-3xl text-black-600 text-center">{fields?.points || "N/A"}</p>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="w-full h-full relative">
+
+                                        {/* 先显示 NFT 信息 */}
+                                        {usedNftData && (
+                                            <div className="w-full p-3 bg-purple-50 rounded-lg border-2 border-purple-100 mb-1">
+                                                <p className="text-lg font-medium text-purple-800 flex justify-between items-center">
+                                                    <span>
+                                                        <span className="font-semibold">Active NFT: </span>
+                                                        {usedNftData.data.content.fields.factor}倍签到奖励
+                                                    </span>
+                                                    <span className="text-purple-600">
+                                                        剩余时间: {
+                                                            parseInt(usedNftData.data.content.fields.active_time) -
+                                                            parseInt(usedNftData.data.content.fields.checkin_time)
+                                                        } 天
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {/* 然后是图片区域 */}
+                                        <div className="w-full h-[400px] relative">
                                             <Image 
                                                 src="/bg2.jpg" 
                                                 alt="NFT Image" 
                                                 width={400}
-                                                height={500}
+                                                height={500}    
                                                 className="w-full h-full object-cover border-2 border-[#dcdee9]" 
                                             />
-                                            <div className="absolute inset-0 z-10 mt-20 flex flex-col items-center text-4xl text-gray-400 font-bold">
-                                                Keep Check In and you can Get Points
+                                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-4xl text-gray-400 font-bold">
+                                                Keep check in , you can get FATE token and points!
                                             </div>
                                         </div>
-                                        {usedNftData && (
-                                            <div className="mt-4 p-3 bg-purple-50 rounded-lg">
-                                                <p className="text-lg font-medium text-purple-800">
-                                                    <span className="font-semibold">Active NFT:</span>{" "}
-                                                    {usedNftData.data.content.fields.factor}倍签到奖励
-                                                </p>
-                                                <p className="text-sm text-purple-600">
-                                                    剩余时间: {
-                                                        parseInt(usedNftData.data.content.fields.active_time) -
-                                                        parseInt(usedNftData.data.content.fields.checkin_time)
-                                                    } 天
-                                                </p>
-                                            </div>
-                                        )}
                                     </div>
                                 );
                             })

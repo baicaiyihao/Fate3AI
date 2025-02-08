@@ -130,7 +130,7 @@ const CheckIn: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
                     Consecutive Check-in: 1 Day
                 </h1>
                 <p className="text-3xl text-nav">
-                    Points Reward: 100
+                    FATE Token Reward: 150
                 </p>
             </div>
             
