@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState ,useCallback, useEffect} from "react";
 import { base_prompt_en,  } from '../utils/fateprompt';
 import Image from "next/image";
 import { Button } from "@headlessui/react";
@@ -20,14 +20,10 @@ interface CardListProps {
     onSuccess?: () => void;
 }
 
-export default function CardList({ totalCards = 22, drawCount = 1 }: CardListProps, onSuccess: () => void){
+export default function CardList({ totalCards = 22, drawCount = 1,onSuccess }: CardListProps){
     const arr = Array.from({ length: totalCards }, (_, index) => index + 1);
     const [selectedCards, setSelectedCards] = useState<number[]>([]);
     const [randomNumbers, setRandomNumbers] = useState<number[]>([]);
-    const currentAccount = useCurrentAccount();
-    const { mutateAsync: signAndExecute, isError } = useSignAndExecuteTransaction();
-    const PackageId = useNetworkVariable("PackageId");
-    const [userObjects, setUserObjects] = useState<CategorizedObjects | null>(null);
     const [question, setQuestion] = useState('');
     const [response, setResponse] = useState('');
     const [cardValue, setCardValue] = useState<string[]>([]);
@@ -48,55 +44,92 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     //     }
     // };
 
-    const handleCardClick = () => {
-        if (selectedCards.length === drawCount && randomNumbers.length === 0) {
-            const numbers: number[] = [];
-            const availableCards = arr.filter((_, index) => !selectedCards.includes(index)); // 排除已选中的卡牌
-    
-            if (availableCards.length < drawCount) {
-                alert("Not enough unique cards available to draw.");
-                return;
-            }
-    
-            // 随机选择不重复的卡牌
-            for (let i = 0; i < drawCount; i++) {
-                const randomIndex = Math.floor(Math.random() * availableCards.length);
-                const randomCard = availableCards[randomIndex];
-                numbers.push(randomCard);
-                availableCards.splice(randomIndex, 1); // 移除已选中的卡牌，避免重复
-            }
-    
-            setRandomNumbers(numbers);
-            console.log(numbers);   
-            let cardValue = [];
-            for (let i = 0; i < numbers.length; i++) {
-                const index = numbers[i];
-                if (TAROT_CARDS[index]) {
-                  const value = TAROT_CARDS[index].value;
-                  cardValue.push(value);
-                }
-                setCardValue(cardValue);
-                
-            }
-            console.log("setingcardValue:",cardValue); //use code for divination
+    useEffect(() => {
+        if (randomNumbers.length > 0) {
+            const selectedValues = randomNumbers.map(index => TAROT_CARDS[index]?.value || '');
+            setCardValue(selectedValues);
         }
-        else if (randomNumbers.length > 0 ) {
-            alert('You have already completed divination');
-        } 
-        else {
-            alert(`Please select ${drawCount} cards first`);
-        }
-    };
+    }, [randomNumbers]); 
 
+    // const handleCardClick = () => {
+    //     if (selectedCards.length === drawCount && randomNumbers.length === 0) {
+    //         const numbers: number[] = [];
+    //         const availableCards = arr.filter((_, index) => !selectedCards.includes(index)); // 排除已选中的卡牌
     
-    const onCardClick = (index: number) => {
-        if (selectedCards.includes(index)) {
-            setSelectedCards(selectedCards.filter(cardIndex => cardIndex !== index));
-        } else if (selectedCards.length < drawCount) {
-            setSelectedCards([...selectedCards, index]);
-        } else {
-            alert(`You can only select ${drawCount} cards`);
+    //         if (availableCards.length < drawCount) {
+    //             alert("Not enough unique cards available to draw.");
+    //             return;
+    //         }
+    
+    //         // 随机选择不重复的卡牌
+    //         for (let i = 0; i < drawCount; i++) {
+    //             const randomIndex = Math.floor(Math.random() * availableCards.length);
+    //             const randomCard = availableCards[randomIndex];
+    //             numbers.push(randomCard);
+    //             availableCards.splice(randomIndex, 1); // 移除已选中的卡牌，避免重复
+    //         }
+    
+    //         setRandomNumbers(numbers);
+
+    //         console.log(numbers);  
+             
+    //         let cardValue = [];
+    //         for (let i = 0; i < numbers.length; i++) {
+    //             const index = numbers[i];
+    //             if (TAROT_CARDS[index]) {
+    //               const value = TAROT_CARDS[index].value;
+    //               cardValue.push(value);
+    //               setCardValue((prev) => [...prev, value]);
+
+    //             }
+                
+    //         }
+    //         console.log("setingcardValue:",cardValue); //use code for divination
+    //     }
+    //     else if (randomNumbers.length > 0 ) {
+    //         alert('You have already completed divination');
+    //     } 
+    //     else {
+    //         alert(`Please select ${drawCount} cards first`);
+    //     }
+    // };
+
+    const handleCardClick = () => {
+        if (selectedCards.length !== drawCount || randomNumbers.length > 0) {
+            alert(randomNumbers.length > 0 ? 'You have already completed divination' : `Please select ${drawCount} cards first`);
+            return;
         }
+
+        const availableCards = arr.filter(card => !selectedCards.includes(card));
+        if (availableCards.length < drawCount) {
+            alert("Not enough unique cards available to draw.");
+            return;
+        }
+
+        const drawnNumbers = new Set<number>();
+        while (drawnNumbers.size < drawCount) {
+            const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+            drawnNumbers.add(randomCard);
+        }
+
+        setRandomNumbers(Array.from(drawnNumbers));
+    };
+    
+    // const onCardClick = (index: number) => {
+    //     if (selectedCards.includes(index)) {
+    //         setSelectedCards(selectedCards.filter(cardIndex => cardIndex !== index));
+    //     } else if (selectedCards.length < drawCount) {
+    //         setSelectedCards([...selectedCards, index]);
+    //     } else {
+    //         alert(`You can only select ${drawCount} cards`);
+    //     }
+    // };
+
+
+    const onCardClick = (index: number) => {
+        setSelectedCards(prev =>
+            prev.includes(index) ? prev.filter(card => card !== index) : prev.length < drawCount ? [...prev, index] : prev
+        );
     };
 
 
@@ -121,33 +154,48 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
     
 
 
-    const handleSubmit = async (cardValue: string[],question:string) => {
-        console.log("handleSubmit:start");
-        console.log("use:",cardValue);
-        console.log("question:",question);
+const [loading, setLoading] = useState(false);
 
-        const formDataToSend = new FormData();
-        formDataToSend.append('user', '');//agent角色名称
-        formDataToSend.append('text',  base_prompt_en +"Cards:"+ cardValue+"\n"+ question);
-        formDataToSend.append('action',"NONE")
-        console.log("url:",ELIZA_URL+AGENT_ID+'/message');
-        try {
-          const response = await fetch(ELIZA_URL+AGENT_ID+'/message', {
+const handleSubmit = useCallback(async (cardValue: string[], question: string) => {
+    if (loading) return; // 避免重复提交
+
+    setLoading(true);
+    setResponse(""); // 清空上次的结果
+    console.log("handleSubmit:start");
+    console.log("use:", cardValue);
+    console.log("question:", question);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('user', '');
+    formDataToSend.append('text', base_prompt_en + "Cards:" + cardValue + "\n" + question);
+    formDataToSend.append('action', "NONE");
+
+    console.log("url:", ELIZA_URL + AGENT_ID + '/message');
+
+    try {
+        const response = await fetch(ELIZA_URL + AGENT_ID + '/message', {
             method: 'POST',
             body: formDataToSend,
             headers: {
-              'Accept': 'application/json',
-              'Accept-Language': 'zh-CN,zh;q=0.9',
+                'Accept': 'application/json',
+                'Accept-Language': 'zh-CN,zh;q=0.9',
             },
-          });
-    
-          const data = await response.json(); // 获取响应数据
-          console.log("response data：",data)
-          setResponse(data.map((item:any)=>item.text)); // 显示响应
-        } catch (error) {
-          setResponse(`错误: ${(error as Error).message}`); // 显示错误信息
-        }
-      };
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const data = await response.json();
+        console.log("response data：", data);
+
+        setResponse(data.map((item: any) => item.text).join("\n")); // 处理响应
+    } catch (error) {
+        console.error("请求失败:", error);
+        setResponse(`❌ 请求失败: ${(error as Error).message}`);
+    } finally {
+        setLoading(false);
+    }
+}, [loading]); // 依赖项，避免 handleSubmit 频繁重新创建
+
 
     return (
         <div className="flex w-full h-full flex-col items-center justify-center overflow-x-auto mt-10">
@@ -186,11 +234,15 @@ export default function CardList({ totalCards = 22, drawCount = 1 }: CardListPro
                     <div className='w-1/4'>
 
                     <BuyItems onSuccess={()=>{
-                            handleSubmit(cardValue,question)
+                        if (!loading) handleSubmit(cardValue, question);
                         }}/>
                     </div>
+                    {loading && <p className="text-blue-500">Loading...</p>}
+
                   <div className="text-purple-600">{response}</div>
+
             </div>
         </div>
     );
+    
 }
