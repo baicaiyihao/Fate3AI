@@ -4,7 +4,7 @@ const ParticlesBg = dynamic(() => import("particles-bg"), { ssr: false })
 
 export default function More() {
   return (
-    <main className="w-full bg-mainpage">
+    <main className="w-full bg-mainpage overflow-auto">
       <ParticlesBg type="cobweb" color="#4150B5"
        bg={ {
         position: "absolute",

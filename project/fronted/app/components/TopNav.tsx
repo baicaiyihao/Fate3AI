@@ -19,8 +19,9 @@ export function TopNav() {
     useEffect(() => {
         localStorage.setItem('suiAccount', String(suiAccount?.address) || '');
     }, [suiAccount]);
-
+ 
     return (
+        <div className="fade-in">
         <div className="flex w-full h-24 bg-nav flex-row z-50">
             <div className=" ml-5 w-1/4 flex flex-row text-white items-center">
                 <Image
@@ -45,9 +46,9 @@ export function TopNav() {
                 </div>
                 <div className="w-1/6  text-white/50">
                     <Link
-                        className={`link ${pathname.startsWith("/sync") ? "text-white" : ""
+                        className={`link ${pathname.startsWith("/lottery") ? "text-white" : ""
                             } block w-full h-full leading-[52px]`}
-                        href="/sync"
+                        href="/lottery"
                     >
                         Lottery
                     </Link>
@@ -68,6 +69,15 @@ export function TopNav() {
                         href="/checkin"
                     >
                         Check in
+                    </Link>
+                </div>
+                <div className="w-1/6  text-white/50">
+                    <Link
+                        className={`link ${pathname.startsWith("/swap") ? "text-white" : ""
+                            } block w-full h-full leading-[52px]`}
+                        href="/swap"
+                    >
+                        Swap
                     </Link>
                 </div>
                 {/* <div className="w-1/6  text-white/50">
@@ -121,6 +131,7 @@ export function TopNav() {
             <div className="w-1/4 flex flex-row items-center justify-end bg-nav text-xl mr-5">
                 <ConnectButton />
             </div>
+        </div>
         </div>
     );
 }
