@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec23e739-67f3-427d-90f4-b997e8db1b19" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/project/fronted/app/components/Title.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/project/fronted/app/components/Title.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/fronted/app/components/TopNav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/project/fronted/app/components/TopNav.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/fronted/components/divination.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/project/fronted/components/divination.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/fronted/components/setRaffleNft.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/project/fronted/components/setRaffleNft.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="ec23e739-67f3-427d-90f4-b997e8db1b19" name="更改" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,7 +54,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1738773607801</updated>
-      <workItem from="1738773608900" duration="3156000" />
+      <workItem from="1738773608900" duration="3756000" />
     </task>
     <servers />
   </component>
