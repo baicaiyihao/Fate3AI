@@ -14,4 +14,5 @@ npm start
 ```
 
 ## Youtube video
-[![Watch the video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=WkIPojLI_uw)
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=WkIPojLI_uw" frameborder="0" allowfullscreen></iframe>
+
