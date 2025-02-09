@@ -4,7 +4,7 @@ card_metad:卡牌:[Fool,Magician,Priestess].
 question:问题:明天外出运势如何？
 */
 export const base_prompt = "说明：根据发送的卡牌 和 问题给出占卜解释，/n"
-export const base_prompt_en = "Note: Given a divination explanation based on the sent card and problem";
+export const base_prompt_en = "Note: Given a divination explanation based on the sent card and problem.English reply";
 export const card_metad = "卡牌:[Fool,Magician,Priestess]. ";
 export const question = "问题:";
 export const last_prompts = base_prompt + card_metad + question;
