@@ -137,13 +137,13 @@ export default function Getuserinfo() {
                                                 <p className="text-lg font-medium text-purple-800 flex justify-between items-center">
                                                     <span>
                                                         <span className="font-semibold">Active NFT: </span>
-                                                        {usedNftData.data.content.fields.factor}倍签到奖励
+                                                        {usedNftData.data.content.fields.factor}x Check-in Reward
                                                     </span>
                                                     <span className="text-purple-600">
-                                                        剩余时间: {
+                                                        time: {
                                                             parseInt(usedNftData.data.content.fields.active_time) -
                                                             parseInt(usedNftData.data.content.fields.checkin_time)
-                                                        } 天
+                                                        } days
                                                     </span>
                                                 </p>
                                             </div>

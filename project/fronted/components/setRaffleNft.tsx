@@ -264,7 +264,7 @@ export default function SetRaffleNft() {
                                                     <span className="font-mono text-sm">{nftId.slice(0, 10)}...</span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    {fields.active_time} 天
+                                                    {fields.active_time} days
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <span className={`font-medium ${

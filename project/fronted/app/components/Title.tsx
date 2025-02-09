@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 export default function Title() {
-  const [title, setTitle] = useState('Fate AI')
+  const [title, setTitle] = useState('Fate3AI')
   
 
   return (

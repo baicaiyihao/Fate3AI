@@ -32,7 +32,7 @@ export function TopNav() {
                     height={40}
                     priority
                 />
-                <p className="mt-1 text-4xl">Fate AI</p>
+                <p className="mt-1 text-4xl">Fate3AI</p>
             </div>
             <div className="w-1/2 flex flex-between items-center bg-nav text-2xl">
                 <div className="w-1/6  text-white/50">
