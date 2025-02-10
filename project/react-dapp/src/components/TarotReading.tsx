@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { base_prompt, question } from '../utils/fateprompt';
+const AGENT_ID = import.meta.env.VITE_ELIZA_AGENT_ID || '';
+const ELIZA_URL = import.meta.env.VITE_ELIZA_URL || '';
 
 const MyForm = () => {
   const [formData, setFormData] = useState({
@@ -6,6 +9,7 @@ const MyForm = () => {
     email: '',
     message: '',
   });
+
   const [response, setResponse] = useState('');
 
   const handleChange = (e: { target: { name: any; value: any; }; }) => {
@@ -20,11 +24,11 @@ const MyForm = () => {
     e.preventDefault(); // 阻止默认提交行为
     const formDataToSend = new FormData();
     formDataToSend.append('user', formData.name);//agent角色名称
-    formDataToSend.append('text',  "塔罗牌：The Fool"+formData.message);
+    formDataToSend.append('text',  base_prompt+"塔罗牌：The Fool"+question+formData.message);
     formDataToSend.append('action',"REPLY")
 
     try {
-      const response = await fetch('http://34.130.171.194:3000/44796f3c-9b73-077b-b789-df5b0db6896e/message', {
+      const response = await fetch(ELIZA_URL+AGENT_ID+'/message', {
         method: 'POST',
         body: formDataToSend,
         headers: {
