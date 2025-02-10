@@ -60,7 +60,7 @@ module fate3ai::profile {
         raffle_nft: &mut RaffleNFT,
         name: String,
     ) {
-        dynamic_field::remove<String, ID>(&mut profile.id, name);
+        dynamic_field::remove<String, address>(&mut profile.id, name);
         profile.daily_points = profile.daily_points / raffle_nft.factor;
     }
 
@@ -76,18 +76,18 @@ module fate3ai::profile {
         profile: &mut Profile,
         name: String,
         raffle_nft: &mut RaffleNFT,
-        ctx: &TxContext,
+        ctx: &mut TxContext,
     ) {
         let this_epoch_time = ctx.epoch_timestamp_ms();
         if (profile.last_time != 0) {
-            assert!(is_same_day(this_epoch_time, profile.last_time), 0);
+            assert!(!is_same_day(this_epoch_time, profile.last_time), 0);
             if (dynamic_field::exists_(&profile.id, name)) {
-                assert!(dynamic_field::borrow(&profile.id, name) == object::id(raffle_nft), 1);
-                if (raffle_nft.checkin_time < raffle_nft.active_time) {
+                assert!(dynamic_field::borrow(&profile.id, name) == object::id_to_address(&object::id(raffle_nft)), 1);
+                if ((raffle_nft.checkin_time + 1) < raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
-                } else if (raffle_nft.checkin_time == raffle_nft.active_time) {
+                } else if ((raffle_nft.checkin_time + 1) < raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
@@ -99,12 +99,12 @@ module fate3ai::profile {
             }
         } else {
             if (dynamic_field::exists_(&profile.id, name)) {
-                assert!(dynamic_field::borrow(&profile.id, name) == object::id(raffle_nft), 1);
-                if (raffle_nft.checkin_time < raffle_nft.active_time) {
+                assert!(dynamic_field::borrow(&profile.id, name) == object::id_to_address(&object::id(raffle_nft)), 1);
+                if ((raffle_nft.checkin_time + 1) < raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
-                } else if (raffle_nft.checkin_time == raffle_nft.active_time) {
+                } else if ((raffle_nft.checkin_time + 1) == raffle_nft.active_time) {
                     profile.last_time = this_epoch_time;
                     profile.points = profile.points + 1;
                     raffle_nft.checkin_time = raffle_nft.checkin_time + 1;
@@ -157,7 +157,7 @@ module fate3ai::profile {
         transfer::public_transfer(raffle_nft, user);
     }
 
-    public(package) fun burn_raffle_nft(raffle_nft: RaffleNFT, _ctx: &mut TxContext) {
+    public fun burn_raffle_nft(raffle_nft: RaffleNFT, _ctx: &mut TxContext) {
         let RaffleNFT { id, active_time: _, factor: _, checkin_time: _ } = raffle_nft;
         object::delete(id);
     }

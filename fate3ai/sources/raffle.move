@@ -3,6 +3,7 @@ module fate3ai::raffle {
     use fate3ai::profile::mint_raffle_nft;
     use std::string::String;
     use sui::clock::{Clock, timestamp_ms};
+    use sui::event::emit;
 
     public struct RaffleInfo has key {
         id: UID,
@@ -32,6 +33,10 @@ module fate3ai::raffle {
         id: UID,
         activetime: u64, // Prize validity period (in days)
         factor: u64, // Prize multiplier factor
+    }
+
+    public struct RaffleEmit has copy, drop{
+        result: u64,
     }
 
     public fun create_raffle(
@@ -129,7 +134,9 @@ module fate3ai::raffle {
             mint_raffle_nft(prize.third_prize_duration, ctx.sender(), ctx);
         } else {
             mint_token(token_cap, raffleinfo.refund_rate, ctx.sender(), ctx);
-        }
+        };
+        
+        emit(RaffleEmit { result: final_rand });
     }
 
     // Function to get the prize details (validity period and factor)

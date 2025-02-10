@@ -70,17 +70,6 @@ fun test_create_profile(){
 
     };
 
-    test_scenario::next_tx(scenario,user);
-
-    {
-        let mut clock1 =  create_for_testing(test_scenario::ctx(scenario));
-        set_for_testing(&mut clock1,1736311754);
-        pyth::use_pyth_price(
-            clock1,
-            0x50c67b3fd225db8912a424dd4baed60ffdde625ed2feaaf283724f9608fea266,
-        );
-
-    };
 
     test_scenario::end(scenario_val);
 

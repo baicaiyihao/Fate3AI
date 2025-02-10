@@ -19,7 +19,7 @@ module fate3ai::pyth {
 
         // SUI/USD price feed ID
         assert!(
-            price_id!=x"50c67b3fd225db8912a424dd4baed60ffdde625ed2feaaf283724f9608fea266",
+            price_id==x"50c67b3fd225db8912a424dd4baed60ffdde625ed2feaaf283724f9608fea266",
             E_INVALID_ID,
         );
 

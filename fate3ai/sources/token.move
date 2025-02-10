@@ -56,6 +56,16 @@ module fate3ai::fate {
         price: u64,
     }
 
+        //Spend token event
+    public struct BuyEvent1 has copy, drop {
+        buyer: address,
+        item: String,
+        price1: u64,
+        price2: u64,
+        price3: u64,
+        price4: u64,
+    }
+
     fun init(otw: FATE, ctx: &mut TxContext) {
         let deployer = ctx.sender();
         let admin_cap = AdminCap { id: object::new(ctx) };
@@ -108,7 +118,7 @@ module fate3ai::fate {
         transfer::public_freeze_object(metadata);
     }
 
-        // Everyday checkin, you can get 150 Token<FATE>
+    // Everyday checkin, you can get 150 Token<FATE>
     public fun signin2earn(
         profile: &mut Profile,
         token_cap: &mut AppTokenCap,
@@ -124,7 +134,7 @@ module fate3ai::fate {
         );
     }
 
-    // Everyday checkin, you can get 150 Token<FATE>
+    // Everyday checkin, you can get 300 Token<FATE>
     public fun signin2earn_nft(
         profile: &mut Profile,
         name: String,
@@ -190,11 +200,13 @@ module fate3ai::fate {
     ) {
         let sui_price = use_pyth_price(clock, price_info_object);
         let token_price = table::borrow(&token_record.prices, item);
-        let paysui_amount = payamount * 10^8 / sui_price;
+        let paysui_amount = ((payamount * 100000000 * 1000000000) as u256 / (sui_price as u256)) as u64 ;
+
 
         assert!(suicoin.value() > paysui_amount, EWrongAmount);
 
         let paycoin = suicoin.split(paysui_amount, ctx);
+        let value = paycoin.value();
         suipool.coin.join(paycoin.into_balance());
 
         let token_amount = payamount * (*token_price);
@@ -205,6 +217,14 @@ module fate3ai::fate {
             req,
             ctx,
         );
+        emit(BuyEvent1 {
+            buyer: ctx.sender(),
+            item,
+            price1: sui_price,
+            price2: value,
+            price3: paysui_amount,
+            price4: token_amount,
+        });
     }
 
     // ------ Admin Functions ---------
