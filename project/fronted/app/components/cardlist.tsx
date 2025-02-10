@@ -86,19 +86,21 @@ export default function CardList({ totalCards = 22, drawCount = 1,onSuccess }: C
         {arr.map((item, index) => (
             <div
                 key={index}
-                onClick={() => onCardClick(index)}
-                className={`absolute transition-transform duration-300 ease-in-out cursor-pointer 
-                    hover:-translate-y-4 
-                    ${selectedCards.includes(index) ? '-translate-y-6 scale-110' : ''}`}
+                onClick={() =>  onCardClick(index)}
+                className={`ml-10
+                    absolute transition-all duration-300 ease-in-out 
+                    hover:-translate-y-6
+                    ${selectedCards.includes(index) ? '-translate-y-6' : ''}
+                `}
                 style={{
-                    left: `${index * 50}px`, // 调整间距
+                    left: `${index * 35}px`,
                     zIndex: arr.length - index
                 }}
             >
                 <Image
                     src="/card.png"
                     alt="cardlist"
-                    className="object-cover rounded-lg shadow-lg"
+                    className="object-cover"
                     width={120}
                     height={200}
                 />

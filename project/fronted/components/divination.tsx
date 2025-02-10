@@ -62,7 +62,7 @@ const Divination: React.FC<{ cardValue: string[], question: string, onSuccess: (
 
 
             if (!result || isError) {
-                toast.error("Payment failed");
+                console.log("Payment failed");
             }
 
             // 2️⃣ **支付成功后，发送占卜请求**
