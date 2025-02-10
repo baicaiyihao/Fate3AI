@@ -68,7 +68,7 @@ const Divination: React.FC<{ cardValue: string[], question: string, onSuccess: (
             // 2️⃣ **支付成功后，发送占卜请求**
             const formDataToSend = new FormData();
             formDataToSend.append('user', '');
-            formDataToSend.append('text', base_prompt_en + `Cards: ${cardValue.join(", ")}\n${question}`);
+            formDataToSend.append('text', base_prompt_en + `Cards: ${cardValue.join(", ")}\n${question} Use English reply`);
             formDataToSend.append('action', "NONE");
 
             const response = await fetch(ELIZA_URL + AGENT_ID + '/message', {
