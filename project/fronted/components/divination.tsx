@@ -56,6 +56,7 @@ const Divination: React.FC<{ cardValue: string[], question: string, onSuccess: (
                 ],
             });
 
+
             const result = await signAndExecute({ transaction: tx });
 
             await new Promise((resolve) => setTimeout(resolve, 5000));
