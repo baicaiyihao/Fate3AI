@@ -1,10 +1,10 @@
-export const TESTNET_FATE3AI_PACKAGE_ID = "0xe80c090d265c16c43cf37aa69544167c09bb028a078a9e9f11d9f008e0ee1ba5";
-export const TESTNET_AppTokenCap = "0x4c3163bc8a100fd31160ca0f1dad9cec0a5ca53c51907e3ca952fc8b040b26d3";
-export const TESTNET_Suipool = "0x27b130bc9d70a57d013d3a24f23d4bf4b86aaa5d9294fa8bdd8c2a18e8cbce21";
-export const TESTNET_PriceRecord = "0x1bf5df00fa8d5dbaece44e29f28f8933978138d743144113e437c097c65281cf";
-export const TESTNET_TokenRecord = "0x824e0a7466975aa8fba61f8a57020c34a20d3e757812c0a9e8630458b096292d";
-export const TESTNET_TokenPolicy = "0xc59e1ccfcd9520848cc1ec7652ffb13f8990e9daef0dc866317216de769e470f";
-export const TESTNET_RaffleInfo = "0x05529f9a6070768da33a3acf8975bfc8f9018c7bc3877b2216cec2df481dbede";
+export const TESTNET_FATE3AI_PACKAGE_ID = "0x6ba04ff5b68e55b879fe94117525f6d2955fae8125905673eaf085ba2764a9b2";
+export const TESTNET_AppTokenCap = "0xdd2f0ff64cd6dd980846d74cffd518691f76169db36fc35b103322aa92030a7b";
+export const TESTNET_Suipool = "0x9668b6823f53f2a37173d189064e06f6819274ce68152a97a24b41702ac68f35";
+export const TESTNET_PriceRecord = "0x3694f2b3af5bad072eded100520fa3691f6fc7fc267915d8753e451a4c4ce8d8";
+export const TESTNET_TokenRecord = "0x7dfdf1eb91e2ce15abbc36c2b92c744f27fa6fc4c56d03f623ec4e826ab1ef78";
+export const TESTNET_TokenPolicy = "0xbc498a925ac7c8bac5aedc8aa12c5da3f058a192db9a5b098b7d124aa470c874";
+export const TESTNET_RaffleInfo = "0x32512939c6ca4dad5489d878030c901860abd6a17a7a203eb80279c5519427c6";
 export const TESTNET_TIME = "0x6";
 
 
