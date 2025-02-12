@@ -8,6 +8,7 @@ import { getUserProfile } from "../utils/getUserObject";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 import suiClient from "../cli/suiClient";
+import { eventBus } from "@/utils/eventBus";
 
 const CheckIn: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const currentAccount = useCurrentAccount();
@@ -81,10 +82,11 @@ const CheckIn: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             });
     
             const result = await signAndExecute({ transaction: tx });
-            console.log(result);
+            await new Promise((resolve) => setTimeout(resolve, 2000));
     
             if (result && !isError) {
                 onSuccess();
+                eventBus.emit('refreshProfile');
             }
         } catch (error) {
             console.error("Error checking in:", error);
@@ -112,10 +114,11 @@ const CheckIn: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
             });
     
             const result = await signAndExecute({ transaction: tx });
-            console.log(result);
-    
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
             if (result && !isError) {
                 onSuccess();
+                eventBus.emit('refreshProfile');
             }
         } catch (error) {
             console.error("Error checking in with NFT:", error);

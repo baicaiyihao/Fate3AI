@@ -56,7 +56,7 @@ module fate3ai::fate {
         price: u64,
     }
 
-        //Spend token event
+    //Spend token event
     public struct BuyEvent1 has copy, drop {
         buyer: address,
         item: String,
@@ -124,8 +124,9 @@ module fate3ai::fate {
         token_cap: &mut AppTokenCap,
         ctx: &mut TxContext,
     ) {
+        let amount = profile::daily_points(profile);
         profile::checkin(profile, ctx);
-        let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
+        let app_token = token::mint(&mut token_cap.cap, amount, ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
@@ -142,8 +143,9 @@ module fate3ai::fate {
         token_cap: &mut AppTokenCap,
         ctx: &mut TxContext,
     ) {
+        let amount = profile::daily_points(profile);
         profile::checkin_withnft(profile, name, raffle_nft, ctx);
-        let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
+        let app_token = token::mint(&mut token_cap.cap, amount, ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
@@ -200,8 +202,8 @@ module fate3ai::fate {
     ) {
         let sui_price = use_pyth_price(clock, price_info_object);
         let token_price = table::borrow(&token_record.prices, item);
-        let paysui_amount = ((payamount * 100000000 * 1000000000) as u256 / (sui_price as u256)) as u64 ;
-
+        let paysui_amount =
+            ((payamount * 100000000 * 1000000000) as u256 / (sui_price as u256)) as u64;
 
         assert!(suicoin.value() > paysui_amount, EWrongAmount);
 

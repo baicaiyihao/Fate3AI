@@ -7,6 +7,7 @@ import { TESTNET_FATE3AI_PACKAGE_ID } from "../config/constants";
 import { Transaction } from "@mysten/sui/transactions";
 import { useNetworkVariable } from "../config/networkConfig";
 import suiClient from "../cli/suiClient";
+import { eventBus } from '../utils/eventBus';
 
 const REFRESH_INTERVAL = 3000; // 每 3 秒刷新一次
 
@@ -34,6 +35,15 @@ export default function SetRaffleNft() {
     useEffect(() => {
         if (account?.address) {
             refreshUserProfile();
+            
+            // 监听刷新事件
+            const handleRefresh = () => refreshUserProfile();
+            eventBus.on('refreshNFTs', handleRefresh);
+            
+            // 清理函数
+            return () => {
+                eventBus.off('refreshNFTs', handleRefresh);
+            };
         }
     }, [account?.address]);
 

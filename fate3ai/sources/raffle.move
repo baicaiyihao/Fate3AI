@@ -35,7 +35,7 @@ module fate3ai::raffle {
         factor: u64, // Prize multiplier factor
     }
 
-    public struct RaffleEmit has copy, drop{
+    public struct RaffleEmit has copy, drop {
         result: u64,
     }
 
@@ -135,7 +135,7 @@ module fate3ai::raffle {
         } else {
             mint_token(token_cap, raffleinfo.refund_rate, ctx.sender(), ctx);
         };
-        
+
         emit(RaffleEmit { result: final_rand });
     }
 

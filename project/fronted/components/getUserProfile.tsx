@@ -7,6 +7,7 @@ import { TESTNET_FATE3AI_PACKAGE_ID } from "../config/constants";
 import suiClient from "../cli/suiClient";
 import { useNetworkVariable } from "../config/networkConfig";
 import Image from "next/image";
+import { eventBus } from "@/utils/eventBus";
 const REFRESH_INTERVAL = 3000;
 
 export default function Getuserinfo() {
@@ -86,8 +87,18 @@ export default function Getuserinfo() {
 
     useEffect(() => {
         refreshUserProfile();
+        
+        // 监听刷新事件
+        const handleRefresh = () => refreshUserProfile();
+        eventBus.on('refreshProfile', handleRefresh);
+        
         const intervalId = setInterval(refreshUserProfile, REFRESH_INTERVAL);
-        return () => clearInterval(intervalId);
+        
+        // 清理函数
+        return () => {
+            eventBus.off('refreshProfile', handleRefresh);
+            clearInterval(intervalId);
+        };
     }, [account]);
 
     return (
@@ -178,14 +189,7 @@ export default function Getuserinfo() {
                     </div>
                 )
             ) : (
-                <div className="text-center">
-                    <h3 className="text-2xl font-semibold text-gray-600 mb-4">
-                        Welcome to Fate3AI
-                    </h3>
-                    <h3 className="text-lg text-gray-400">
-                        Please connect your wallet to view your assets
-                    </h3>
-                </div>
+                <p className="text-gray-300">Loading...</p>
             )}
         </div>
     );

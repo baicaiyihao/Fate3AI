@@ -5,6 +5,7 @@ import { useNetworkVariable } from "../config/networkConfig";
 import { TESTNET_AppTokenCap, TESTNET_RaffleInfo } from "../config/constants";
 import { suiClient } from "../cli/suiClient";
 import { Button } from "./ui/button";
+import { eventBus } from '../utils/eventBus';
 
 const Lottery: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const currentAccount = useCurrentAccount();
@@ -77,6 +78,9 @@ const Lottery: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
                     console.log(eventResult);
                     console.log("抽奖结果:", lotteryResultText);
                     setLotteryResult(lotteryResultText);
+                    
+                    // 触发刷新事件
+                    eventBus.emit('refreshNFTs');
                 }
             }
         } catch (error) {
