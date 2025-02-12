@@ -143,8 +143,9 @@ module fate3ai::fate {
         token_cap: &mut AppTokenCap,
         ctx: &mut TxContext,
     ) {
+        let amount = profile::daily_points(profile);
         profile::checkin_withnft(profile, name, raffle_nft, ctx);
-        let app_token = token::mint(&mut token_cap.cap, profile::daily_points(profile), ctx);
+        let app_token = token::mint(&mut token_cap.cap, amount, ctx);
         let req = token::transfer<FATE>(app_token, ctx.sender(), ctx);
         token::confirm_with_treasury_cap<FATE>(
             &mut token_cap.cap,
